@@ -1155,10 +1155,12 @@
                 }
 
                 // Afficher un message de chargement
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '⏳ Génération...';
-                btn.disabled = true;
+                const btn = document.querySelector('.btn-pdf');
+                const originalText = btn ? btn.innerHTML : '📄 Exporter PDF';
+                if (btn) {
+                    btn.innerHTML = '⏳ Génération...';
+                    btn.disabled = true;
+                }
 
                 const canvas = await html2canvas(element, {
                     scale: 1.5,
@@ -1195,17 +1197,20 @@
                 pdf.save('rapport-rcc-m.pdf');
                 
                 // Restaurer le bouton
-                btn.innerHTML = originalText;
-                btn.disabled = false;
+                const btnRestore = document.querySelector('.btn-pdf');
+                if (btnRestore) {
+                    btnRestore.innerHTML = originalText;
+                    btnRestore.disabled = false;
+                }
             } catch (error) {
-                alert('Erreur lors de l\'export PDF : ' + error.message);
+                alert('Erreur lors de l\'export PDF : ' + (error.message || 'Erreur inconnue'));
                 console.error('Erreur PDF:', error);
                 
                 // Restaurer le bouton en cas d'erreur
-                const btn = event.target;
-                if (btn) {
-                    btn.innerHTML = '📄 Exporter PDF';
-                    btn.disabled = false;
+                const btnRestore = document.querySelector('.btn-pdf');
+                if (btnRestore) {
+                    btnRestore.innerHTML = '📄 Exporter PDF';
+                    btnRestore.disabled = false;
                 }
             }
         }
