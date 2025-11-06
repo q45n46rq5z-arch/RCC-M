@@ -384,67 +384,151 @@
             color: #cccccc;
         }
         
-        /* Animation d'accès autorisé */
+        /* Animation d'accès autorisé style hacker */
         #access-granted {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: #000000;
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 20000;
+            overflow: hidden;
         }
         #access-granted.show {
             display: flex;
-            animation: fadeOut 1.5s ease-out forwards;
+            animation: fadeOut 2.5s ease-out forwards;
         }
         @keyframes fadeOut {
-            0% { opacity: 1; }
+            0%, 80% { opacity: 1; }
             100% { opacity: 0; }
         }
         .granted-content {
             text-align: center;
-            animation: slideIn 0.5s ease-out;
+            position: relative;
         }
-        @keyframes slideIn {
-            from {
-                transform: translateY(-30px);
-                opacity: 0;
+        .hacker-text {
+            font-family: 'Courier New', monospace;
+            font-size: 64px;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
+            position: relative;
+            animation: glitch 0.3s infinite;
+        }
+        @keyframes glitch {
+            0%, 100% {
+                transform: translate(0);
+                text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
             }
-            to {
-                transform: translateY(0);
-                opacity: 1;
+            20% {
+                transform: translate(-2px, 2px);
+                text-shadow: -2px 0 10px #ff0000, 2px 0 10px #00ff00;
+            }
+            40% {
+                transform: translate(-2px, -2px);
+                text-shadow: 2px 0 10px #ff0000, -2px 0 10px #00ff00;
+            }
+            60% {
+                transform: translate(2px, 2px);
+                text-shadow: 2px 0 10px #ff0000, -2px 0 10px #00ff00;
+            }
+            80% {
+                transform: translate(2px, -2px);
+                text-shadow: -2px 0 10px #ff0000, 2px 0 10px #00ff00;
             }
         }
-        .granted-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: checkmark 0.6s ease-out;
+        .code-matrix {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #00ff00;
+            line-height: 1.2;
+            opacity: 0;
+            animation: codeAppear 1s ease-in 0.8s forwards;
+            max-width: 600px;
+            text-align: left;
+            background: rgba(0, 255, 0, 0.05);
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
-        @keyframes checkmark {
+        @keyframes codeAppear {
             0% {
-                transform: scale(0) rotate(-45deg);
-            }
-            50% {
-                transform: scale(1.2) rotate(-45deg);
+                opacity: 0;
+                transform: translateY(20px);
             }
             100% {
-                transform: scale(1) rotate(0deg);
+                opacity: 1;
+                transform: translateY(0);
             }
         }
-        .granted-title {
-            font-size: 36px;
-            font-weight: bold;
-            color: #4caf50;
-            margin-bottom: 10px;
+        .code-line {
+            margin: 5px 0;
+            animation: typewriter 0.1s steps(20);
         }
-        .granted-message {
-            font-size: 18px;
-            color: #cccccc;
+        @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        .hacker-dissolve {
+            animation: dissolve 1.2s ease-in forwards;
+        }
+        @keyframes dissolve {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0px);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scale(0.95);
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+                filter: blur(5px);
+            }
+        }
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to bottom, transparent, #00ff00, transparent);
+            animation: scan 2s linear infinite;
+            opacity: 0.5;
+        }
+        @keyframes scan {
+            0% {
+                top: 0;
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                top: 100%;
+                opacity: 0.5;
+            }
+        }
+        .matrix-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 255, 0, 0.03) 4px);
+            pointer-events: none;
         }
     </style>
 </head>
@@ -468,12 +552,13 @@
         </div>
     </div>
     
-    <!-- Animation d'accès autorisé -->
+    <!-- Animation d'accès autorisé style hacker -->
     <div id="access-granted">
+        <div class="matrix-bg"></div>
+        <div class="scan-line"></div>
         <div class="granted-content">
-            <div class="granted-icon">✓</div>
-            <div class="granted-title">ACCÈS AUTORISÉ</div>
-            <div class="granted-message">Chargement...</div>
+            <div class="hacker-text" id="hacker-adf">ADF</div>
+            <div class="code-matrix" id="code-matrix"></div>
         </div>
     </div>
     <div class="container" id="report-content">
