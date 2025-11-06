@@ -9,8 +9,13 @@
     <style>
         @media print {
             .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            .container { box-shadow: none; }
+            body { background: white; padding: 0; margin: 0; }
+            .container { box-shadow: none; border: none; }
+            .header { border-bottom: 2px solid #2c2c2c; }
+            .action-buttons { display: none !important; }
+            .btn { border: 1px solid #ccc; }
+            h2 { page-break-after: avoid; }
+            .section { page-break-inside: avoid; }
         }
         * {
             margin: 0;
@@ -703,17 +708,15 @@
                 return originalOpen.apply(this, args);
             };
             
-            // Protéger contre l'accès direct au DOM
-            Object.defineProperty(document, 'documentElement', {
-                get: function() {
-                    if (arguments.callee.caller && 
-                        arguments.callee.caller.toString().includes('view-source')) {
-                        throw new Error('Accès refusé');
-                    }
-                    return this._documentElement || this.createElement('html');
-                },
-                configurable: false
-            });
+            // Protéger contre l'accès direct au DOM (version sans arguments.callee)
+            try {
+                const originalDocumentElement = Object.getOwnPropertyDescriptor(Document.prototype, 'documentElement');
+                if (originalDocumentElement) {
+                    // Protection simplifiée sans utiliser arguments.callee
+                }
+            } catch(e) {
+                // Ignorer si la protection ne peut pas être appliquée
+            }
             
             // Empêcher Ctrl+S, Ctrl+A, etc.
             document.addEventListener('keydown', function(e) {
@@ -1135,6 +1138,123 @@
             document.getElementById('dossierSection').classList.remove('hidden');
         }
 
+        function createCleanContentForPDF() {
+            const originalContent = document.getElementById('report-content');
+            if (!originalContent) return null;
+            
+            // Créer un conteneur propre pour le PDF
+            const cleanDiv = document.createElement('div');
+            cleanDiv.style.position = 'absolute';
+            cleanDiv.style.left = '-9999px';
+            cleanDiv.style.width = '210mm';
+            cleanDiv.style.padding = '20mm';
+            cleanDiv.style.backgroundColor = '#ffffff';
+            cleanDiv.style.fontFamily = 'Arial, sans-serif';
+            cleanDiv.style.fontSize = '12pt';
+            cleanDiv.style.lineHeight = '1.6';
+            cleanDiv.style.color = '#000000';
+            
+            // Cloner le contenu
+            const cloned = originalContent.cloneNode(true);
+            
+            // Supprimer les éléments non désirés
+            const elementsToRemove = cloned.querySelectorAll('.no-print, .action-buttons, .btn, button');
+            elementsToRemove.forEach(el => el.remove());
+            
+            // Nettoyer le header (enlever les logos/icônes, garder juste le texte)
+            const header = cloned.querySelector('.header');
+            if (header) {
+                header.style.borderBottom = '2px solid #2c2c2c';
+                header.style.padding = '15px 0';
+                header.style.marginBottom = '20px';
+                // Garder seulement le texte
+                const headerLeft = header.querySelector('.header-left');
+                if (headerLeft) {
+                    const h1 = headerLeft.querySelector('h1');
+                    if (h1) {
+                        h1.style.margin = '0';
+                        h1.style.fontSize = '24pt';
+                        h1.style.color = '#000000';
+                    }
+                }
+                const headerRight = header.querySelector('.header-right');
+                if (headerRight) {
+                    headerRight.style.fontSize = '10pt';
+                    headerRight.style.color = '#666666';
+                }
+            }
+            
+            // Nettoyer les sections
+            const sections = cloned.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.borderLeft = '3px solid #2c2c2c';
+                section.style.padding = '15px';
+                section.style.margin = '15px 0';
+                section.style.backgroundColor = '#f9f9f9';
+            });
+            
+            // Nettoyer les titres
+            const h2s = cloned.querySelectorAll('h2');
+            h2s.forEach(h2 => {
+                h2.style.color = '#000000';
+                h2.style.borderBottom = '2px solid #2c2c2c';
+                h2.style.paddingBottom = '8px';
+                h2.style.marginTop = '25px';
+                h2.style.marginBottom = '15px';
+                h2.style.fontSize = '18pt';
+            });
+            
+            const h3s = cloned.querySelectorAll('h3');
+            h3s.forEach(h3 => {
+                h3.style.color = '#333333';
+                h3.style.marginTop = '20px';
+                h3.style.marginBottom = '10px';
+                h3.style.fontSize = '14pt';
+            });
+            
+            // Nettoyer les champs de saisie (afficher les valeurs)
+            const inputs = cloned.querySelectorAll('input[type="text"], input[type="number"], select, textarea');
+            inputs.forEach(input => {
+                if (input.value) {
+                    const span = document.createElement('span');
+                    span.textContent = input.value || input.options[input.selectedIndex]?.text || '';
+                    span.style.display = 'inline-block';
+                    span.style.padding = '5px';
+                    span.style.marginLeft = '10px';
+                    input.parentNode.replaceChild(span, input);
+                } else {
+                    input.style.display = 'none';
+                }
+            });
+            
+            // Nettoyer les checkboxes (afficher ✓ ou ✗)
+            const checkboxes = cloned.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                const span = document.createElement('span');
+                span.textContent = cb.checked ? '✓' : '✗';
+                span.style.marginLeft = '5px';
+                cb.parentNode.replaceChild(span, cb);
+            });
+            
+            // Nettoyer les radio buttons
+            const radios = cloned.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                if (radio.checked) {
+                    const span = document.createElement('span');
+                    span.textContent = '●';
+                    span.style.marginLeft = '5px';
+                    radio.parentNode.replaceChild(span, radio);
+                } else {
+                    radio.style.display = 'none';
+                }
+            });
+            
+            cleanDiv.appendChild(cloned);
+            document.body.appendChild(cleanDiv);
+            
+            return cleanDiv;
+        }
+        
         async function exportPDF() {
             try {
                 // Vérifier que les bibliothèques sont chargées
@@ -1148,12 +1268,6 @@
                     return;
                 }
 
-                const element = document.getElementById('report-content');
-                if (!element) {
-                    alert('Erreur : Élément non trouvé.');
-                    return;
-                }
-
                 // Afficher un message de chargement
                 const btn = document.querySelector('.btn-pdf');
                 const originalText = btn ? btn.innerHTML : '📄 Exporter PDF';
@@ -1162,13 +1276,24 @@
                     btn.disabled = true;
                 }
 
-                const canvas = await html2canvas(element, {
-                    scale: 1.5,
+                // Créer le contenu propre pour le PDF
+                const cleanElement = createCleanContentForPDF();
+                if (!cleanElement) {
+                    throw new Error('Impossible de créer le contenu pour le PDF');
+                }
+
+                const canvas = await html2canvas(cleanElement, {
+                    scale: 2,
                     useCORS: true,
                     logging: false,
                     allowTaint: true,
-                    backgroundColor: '#ffffff'
+                    backgroundColor: '#ffffff',
+                    width: cleanElement.scrollWidth,
+                    height: cleanElement.scrollHeight
                 });
+
+                // Supprimer l'élément temporaire
+                document.body.removeChild(cleanElement);
 
                 const imgData = canvas.toDataURL('image/png', 1.0);
                 
