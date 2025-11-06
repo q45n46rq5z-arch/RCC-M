@@ -899,36 +899,75 @@
             const check5 = parseInt(userInput) === (1700 + 2);
             
             if (check1 && check2 && check3 && check4 && check5) {
-                // Afficher l'animation d'accès autorisé
+                // Afficher l'animation d'accès autorisé style hacker
                 const accessGranted = document.getElementById('access-granted');
+                const hackerAdf = document.getElementById('hacker-adf');
+                const codeMatrix = document.getElementById('code-matrix');
+                
                 accessGranted.classList.add('show');
                 
-                // Son de succès
+                // Son style hacker
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const oscillator = audioContext.createOscillator();
+                    // Son électronique style hacker
+                    const oscillator1 = audioContext.createOscillator();
+                    const oscillator2 = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
                     
-                    oscillator.connect(gainNode);
+                    oscillator1.connect(gainNode);
+                    oscillator2.connect(gainNode);
                     gainNode.connect(audioContext.destination);
                     
-                    // Son agréable (deux tons)
-                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
-                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    oscillator1.frequency.setValueAtTime(440, audioContext.currentTime);
+                    oscillator2.frequency.setValueAtTime(880, audioContext.currentTime);
+                    oscillator1.type = 'square';
+                    oscillator2.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
                     
-                    oscillator.start(audioContext.currentTime);
-                    oscillator.stop(audioContext.currentTime + 0.3);
+                    oscillator1.start(audioContext.currentTime);
+                    oscillator2.start(audioContext.currentTime);
+                    oscillator1.stop(audioContext.currentTime + 0.5);
+                    oscillator2.stop(audioContext.currentTime + 0.5);
                 } catch(e) {
                     // Ignorer si l'audio n'est pas supporté
                 }
+                
+                // Animation de dissolution de "ADF" en code
+                setTimeout(() => {
+                    hackerAdf.classList.add('hacker-dissolve');
+                    
+                    // Générer le code matrix
+                    const codeLines = [
+                        '> INITIALIZING SYSTEM...',
+                        '> AUTHENTICATION SUCCESSFUL',
+                        '> ACCESS LEVEL: ADMIN',
+                        '> USER: ADF',
+                        '> SESSION ID: ' + Math.random().toString(36).substring(2, 15).toUpperCase(),
+                        '> ENCRYPTION: AES-256',
+                        '> STATUS: CONNECTED',
+                        '> LOADING INTERFACE...',
+                        '',
+                        '[████████████████████] 100%'
+                    ];
+                    
+                    codeMatrix.innerHTML = '';
+                    codeLines.forEach((line, index) => {
+                        setTimeout(() => {
+                            const codeLine = document.createElement('div');
+                            codeLine.className = 'code-line';
+                            codeLine.textContent = line;
+                            codeMatrix.appendChild(codeLine);
+                        }, index * 100);
+                    });
+                }, 500);
                 
                 // Masquer la page de mot de passe et afficher le site après l'animation
                 setTimeout(() => {
                     passwordScreen.classList.add('hidden');
                     accessGranted.classList.remove('show');
+                    hackerAdf.classList.remove('hacker-dissolve');
+                    codeMatrix.innerHTML = '';
                     // Créer un token d'authentification sécurisé
                     const token = btoa(btoa('1702' + Date.now().toString().substring(0, 10)));
                     sessionStorage.setItem('auth_token', token);
@@ -936,7 +975,7 @@
                     sessionStorage.setItem('authenticated', 'true');
                     sessionStorage.setItem('failedAttempts', '0');
                     failedAttempts = 0;
-                }, 1500);
+                }, 2500);
             } else {
                 failedAttempts++;
                 sessionStorage.setItem('failedAttempts', failedAttempts.toString());
