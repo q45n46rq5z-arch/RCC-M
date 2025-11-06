@@ -10,12 +10,25 @@
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
-            .container { box-shadow: none; border: none; }
-            .header { border-bottom: 2px solid #2c2c2c; }
+            .container { box-shadow: none; border: none; max-width: 100%; }
+            .header { border-bottom: 2px solid #2c2c2c; margin-bottom: 30px; }
             .action-buttons { display: none !important; }
-            .btn { border: 1px solid #ccc; }
-            h2 { page-break-after: avoid; }
-            .section { page-break-inside: avoid; }
+            .btn { display: none !important; }
+            h2 { 
+                page-break-before: always;
+                page-break-after: avoid;
+                border-bottom: 2px solid #2c2c2c;
+                padding-bottom: 10px;
+                margin-top: 0;
+            }
+            h2:first-of-type { page-break-before: auto; }
+            .section { 
+                page-break-inside: avoid;
+                border-left: none;
+                border: 1px solid #e0e0e0;
+                margin: 20px 0;
+            }
+            .buttons { display: none !important; }
         }
         * {
             margin: 0;
@@ -1163,111 +1176,196 @@
             const originalContent = document.getElementById('report-content');
             if (!originalContent) return null;
             
-            // Créer un conteneur propre pour le PDF
+            // Créer un conteneur propre pour le PDF (format document officiel)
             const cleanDiv = document.createElement('div');
             cleanDiv.style.position = 'absolute';
             cleanDiv.style.left = '-9999px';
             cleanDiv.style.width = '210mm';
-            cleanDiv.style.padding = '20mm';
+            cleanDiv.style.padding = '25mm 20mm';
             cleanDiv.style.backgroundColor = '#ffffff';
             cleanDiv.style.fontFamily = 'Arial, sans-serif';
-            cleanDiv.style.fontSize = '12pt';
-            cleanDiv.style.lineHeight = '1.6';
+            cleanDiv.style.fontSize = '11pt';
+            cleanDiv.style.lineHeight = '1.8';
             cleanDiv.style.color = '#000000';
             
             // Cloner le contenu
             const cloned = originalContent.cloneNode(true);
             
-            // Supprimer les éléments non désirés
-            const elementsToRemove = cloned.querySelectorAll('.no-print, .action-buttons, .btn, button');
+            // Supprimer tous les éléments non désirés
+            const elementsToRemove = cloned.querySelectorAll('.no-print, .action-buttons, .btn, button, .buttons');
             elementsToRemove.forEach(el => el.remove());
             
-            // Nettoyer le header (enlever les logos/icônes, garder juste le texte)
+            // Nettoyer le header (format document officiel)
             const header = cloned.querySelector('.header');
             if (header) {
-                header.style.borderBottom = '2px solid #2c2c2c';
-                header.style.padding = '15px 0';
-                header.style.marginBottom = '20px';
-                // Garder seulement le texte
+                header.style.borderBottom = '2px solid #000000';
+                header.style.padding = '20px 0';
+                header.style.marginBottom = '40px';
+                header.style.backgroundColor = 'transparent';
                 const headerLeft = header.querySelector('.header-left');
                 if (headerLeft) {
                     const h1 = headerLeft.querySelector('h1');
                     if (h1) {
                         h1.style.margin = '0';
-                        h1.style.fontSize = '24pt';
+                        h1.style.fontSize = '20pt';
                         h1.style.color = '#000000';
+                        h1.style.fontWeight = 'bold';
                     }
                 }
                 const headerRight = header.querySelector('.header-right');
                 if (headerRight) {
-                    headerRight.style.fontSize = '10pt';
-                    headerRight.style.color = '#666666';
+                    headerRight.style.fontSize = '9pt';
+                    headerRight.style.color = '#000000';
                 }
             }
             
-            // Nettoyer les sections
+            // Supprimer le texte d'introduction
+            const intro = cloned.querySelector('p');
+            if (intro && intro.textContent.includes('Gestion et contrôle')) {
+                intro.remove();
+            }
+            
+            // Nettoyer les sections (format document officiel - pas de barres latérales)
             const sections = cloned.querySelectorAll('.section');
             sections.forEach(section => {
-                section.style.borderLeft = '3px solid #2c2c2c';
-                section.style.padding = '15px';
-                section.style.margin = '15px 0';
-                section.style.backgroundColor = '#f9f9f9';
+                section.style.borderLeft = 'none';
+                section.style.border = 'none';
+                section.style.borderTop = '1px solid #e0e0e0';
+                section.style.borderBottom = '1px solid #e0e0e0';
+                section.style.padding = '20px 0';
+                section.style.margin = '30px 0';
+                section.style.backgroundColor = 'transparent';
             });
             
-            // Nettoyer les titres
+            // Nettoyer les titres (chaque h2 = nouvelle page)
             const h2s = cloned.querySelectorAll('h2');
-            h2s.forEach(h2 => {
+            h2s.forEach((h2, index) => {
                 h2.style.color = '#000000';
-                h2.style.borderBottom = '2px solid #2c2c2c';
-                h2.style.paddingBottom = '8px';
-                h2.style.marginTop = '25px';
-                h2.style.marginBottom = '15px';
-                h2.style.fontSize = '18pt';
+                h2.style.borderBottom = '2px solid #000000';
+                h2.style.paddingBottom = '10px';
+                h2.style.marginTop = index === 0 ? '0' : '0';
+                h2.style.marginBottom = '25px';
+                h2.style.fontSize = '16pt';
+                h2.style.fontWeight = 'bold';
+                h2.style.pageBreakBefore = index === 0 ? 'auto' : 'always';
+                h2.style.pageBreakAfter = 'avoid';
             });
             
             const h3s = cloned.querySelectorAll('h3');
             h3s.forEach(h3 => {
-                h3.style.color = '#333333';
+                h3.style.color = '#000000';
                 h3.style.marginTop = '20px';
-                h3.style.marginBottom = '10px';
-                h3.style.fontSize = '14pt';
+                h3.style.marginBottom = '12px';
+                h3.style.fontSize = '13pt';
+                h3.style.fontWeight = 'bold';
             });
             
-            // Nettoyer les champs de saisie (afficher les valeurs)
+            const h4s = cloned.querySelectorAll('h4');
+            h4s.forEach(h4 => {
+                h4.style.color = '#000000';
+                h4.style.marginTop = '15px';
+                h4.style.marginBottom = '10px';
+                h4.style.fontSize = '12pt';
+                h4.style.fontWeight = 'bold';
+            });
+            
+            // Nettoyer les champs de saisie (afficher les valeurs comme texte)
             const inputs = cloned.querySelectorAll('input[type="text"], input[type="number"], select, textarea');
             inputs.forEach(input => {
-                if (input.value) {
-                    const span = document.createElement('span');
-                    span.textContent = input.value || input.options[input.selectedIndex]?.text || '';
-                    span.style.display = 'inline-block';
-                    span.style.padding = '5px';
-                    span.style.marginLeft = '10px';
-                    input.parentNode.replaceChild(span, input);
+                const label = input.previousElementSibling;
+                if (input.value || (input.tagName === 'SELECT' && input.selectedIndex > 0)) {
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '12px';
+                    if (label && label.tagName === 'LABEL') {
+                        const labelText = document.createElement('strong');
+                        labelText.textContent = label.textContent + ' : ';
+                        labelText.style.display = 'inline';
+                        div.appendChild(labelText);
+                    }
+                    const value = document.createElement('span');
+                    value.textContent = input.value || input.options[input.selectedIndex]?.text || '';
+                    value.style.display = 'inline';
+                    div.appendChild(value);
+                    input.parentNode.replaceChild(div, input);
+                    if (label && label.tagName === 'LABEL' && label.parentNode === input.parentNode) {
+                        label.remove();
+                    }
                 } else {
                     input.style.display = 'none';
+                    if (label && label.tagName === 'LABEL') {
+                        label.style.display = 'none';
+                    }
                 }
             });
             
-            // Nettoyer les checkboxes (afficher ✓ ou ✗)
+            // Nettoyer les checkboxes (afficher comme liste)
             const checkboxes = cloned.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => {
-                const span = document.createElement('span');
-                span.textContent = cb.checked ? '✓' : '✗';
-                span.style.marginLeft = '5px';
-                cb.parentNode.replaceChild(span, cb);
+                const label = cb.closest('label') || cb.parentElement;
+                const text = label.textContent.replace(cb.outerHTML, '').trim();
+                const div = document.createElement('div');
+                div.style.marginBottom = '8px';
+                div.style.paddingLeft = '20px';
+                div.textContent = (cb.checked ? '☑' : '☐') + ' ' + text;
+                label.parentNode.replaceChild(div, label);
             });
             
             // Nettoyer les radio buttons
             const radios = cloned.querySelectorAll('input[type="radio"]');
+            const radioGroups = {};
             radios.forEach(radio => {
-                if (radio.checked) {
-                    const span = document.createElement('span');
-                    span.textContent = '●';
-                    span.style.marginLeft = '5px';
-                    radio.parentNode.replaceChild(span, radio);
-                } else {
-                    radio.style.display = 'none';
+                const name = radio.name;
+                if (!radioGroups[name]) {
+                    radioGroups[name] = [];
                 }
+                radioGroups[name].push(radio);
+            });
+            
+            Object.keys(radioGroups).forEach(name => {
+                const group = radioGroups[name];
+                const checked = group.find(r => r.checked);
+                if (checked) {
+                    const label = checked.closest('label') || checked.parentElement;
+                    const text = label.textContent.replace(checked.outerHTML, '').trim();
+                    const div = document.createElement('div');
+                    div.style.marginBottom = '8px';
+                    div.style.paddingLeft = '20px';
+                    div.textContent = '● ' + text;
+                    label.parentNode.replaceChild(div, label);
+                    // Supprimer les autres radios du même groupe
+                    group.forEach(r => {
+                        if (r !== checked) {
+                            const otherLabel = r.closest('label') || r.parentElement;
+                            if (otherLabel && otherLabel.parentNode) {
+                                otherLabel.remove();
+                            }
+                        }
+                    });
+                }
+            });
+            
+            // Nettoyer les listes (étapes, plans)
+            const steps = cloned.querySelectorAll('.steps li');
+            steps.forEach(li => {
+                li.style.borderLeft = 'none';
+                li.style.backgroundColor = 'transparent';
+                li.style.padding = '5px 0';
+                li.style.paddingLeft = '25px';
+            });
+            
+            const plans = cloned.querySelectorAll('.plans li');
+            plans.forEach(li => {
+                li.style.backgroundColor = 'transparent';
+                li.style.padding = '5px 0';
+                li.style.paddingLeft = '25px';
+            });
+            
+            // Nettoyer les info-cards
+            const infoCards = cloned.querySelectorAll('.info-card');
+            infoCards.forEach(card => {
+                card.style.border = 'none';
+                card.style.backgroundColor = 'transparent';
+                card.style.padding = '5px 0';
             });
             
             cleanDiv.appendChild(cloned);
