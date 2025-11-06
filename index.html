@@ -637,21 +637,82 @@
                 }
             }, 500);
             
-            // Détection F12 et autres raccourcis
+            // Détection F12 et autres raccourcis (renforcé)
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'F12' || 
                     (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
-                    (e.ctrlKey && e.key === 'U')) {
+                    (e.ctrlKey && e.key === 'U') ||
+                    (e.ctrlKey && e.key === 'u') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'U')) {
                     e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
                     document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;">ACCÈS INTERDIT</div>';
                     return false;
                 }
+            }, true);
+            
+            // Protection supplémentaire contre l'affichage du code source
+            document.addEventListener('keyup', function(e) {
+                if ((e.ctrlKey && e.key === 'U') || (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.reload();
+                    return false;
+                }
+            }, true);
+            
+            // Détecter si quelqu'un essaie d'accéder au code source via l'URL
+            if (window.location.href.includes('view-source:') || 
+                window.location.href.includes('view-source%3A')) {
+                window.location.href = 'about:blank';
+            }
+            
+            // Protection contre l'inspection via le menu contextuel
+            let lastRightClick = 0;
+            document.addEventListener('mousedown', function(e) {
+                if (e.button === 2) { // Clic droit
+                    const now = Date.now();
+                    if (now - lastRightClick < 100) {
+                        // Double clic droit détecté (tentative d'inspection)
+                        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;">ACCÈS INTERDIT</div>';
+                    }
+                    lastRightClick = now;
+                }
             });
             
-            // Empêcher le clic droit
+            // Empêcher le clic droit (renforcé)
             document.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                // Bloquer aussi les touches de raccourci du menu contextuel
+                if (e.shiftKey && e.key === 'F10') {
+                    e.preventDefault();
+                }
                 return false;
+            }, true);
+            
+            // Détecter les tentatives d'accès au code source
+            const originalOpen = window.open;
+            window.open = function(...args) {
+                const url = args[0];
+                if (url && (url.includes('view-source:') || url.includes('javascript:'))) {
+                    return null;
+                }
+                return originalOpen.apply(this, args);
+            };
+            
+            // Protéger contre l'accès direct au DOM
+            Object.defineProperty(document, 'documentElement', {
+                get: function() {
+                    if (arguments.callee.caller && 
+                        arguments.callee.caller.toString().includes('view-source')) {
+                        throw new Error('Accès refusé');
+                    }
+                    return this._documentElement || this.createElement('html');
+                },
+                configurable: false
             });
             
             // Empêcher Ctrl+S, Ctrl+A, etc.
@@ -664,15 +725,32 @@
         })();
         
         // Obfuscation du mot de passe (hash SHA-256 simplifié + encodage)
+        // Le mot de passe est divisé et encodé de manière complexe
         function _0x4a2b() {
-            const _0x1a2b = ['1702'];
-            const _0x2b3c = btoa(_0x1a2b[0]);
+            const _0x1a2b = ['17', '02'];
+            const _0x2b3c = btoa(_0x1a2b[0] + _0x1a2b[1]);
+            // Ajouter du bruit pour rendre le code moins lisible
+            const _0xnoise = ['x', 'y', 'z'];
             return _0x2b3c;
         }
         
         function _0x5c3d(_0x3e4f) {
+            if (!_0x3e4f) return false;
             const _0x6g5h = _0x4a2b();
-            return btoa(_0x3e4f) === _0x6g5h;
+            const _0xencoded = btoa(_0x3e4f);
+            // Vérification avec plusieurs méthodes
+            const _0xcheck1 = _0xencoded === _0x6g5h;
+            const _0xcheck2 = atob(_0xencoded) === atob(_0x6g5h);
+            return _0xcheck1 && _0xcheck2;
+        }
+        
+        // Fonction de décodage inverse (pour rendre le code source moins évident)
+        function _0xdecode(_0xstr) {
+            try {
+                return atob(_0xstr);
+            } catch(e) {
+                return '';
+            }
         }
         
         // Vérification multiple et dispersée
@@ -720,13 +798,19 @@
             const passwordScreen = document.getElementById('password-screen');
             const accessDenied = document.getElementById('access-denied');
             
-            // Vérification multi-couches
+            // Vérification multi-couches (code dispersé pour rendre difficile la lecture)
             const userInput = input.value;
+            // Vérification 1: Base64
+            const _0xb64 = _0xdecode('MTcwMg==');
             const check1 = _0x5c3d(userInput);
             const check2 = _0x7h8i(userInput);
-            const check3 = userInput === atob('MTcwMg=='); // Base64 de 1702
+            const check3 = userInput === _0xb64;
+            // Vérification supplémentaire avec caractères Unicode
+            const check4 = userInput === String.fromCharCode(49, 55, 48, 50);
+            // Vérification par calcul
+            const check5 = parseInt(userInput) === (1700 + 2);
             
-            if (check1 && check2 && check3) {
+            if (check1 && check2 && check3 && check4 && check5) {
                 // Afficher l'animation d'accès autorisé
                 const accessGranted = document.getElementById('access-granted');
                 accessGranted.classList.add('show');
