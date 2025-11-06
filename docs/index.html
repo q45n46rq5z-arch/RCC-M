@@ -567,28 +567,8 @@
     </style>
 </head>
 <body>
-    <!-- Sélection de la norme -->
-    <div id="norm-selection-screen">
-        <div class="norm-selection-container">
-            <h1>Sélection de la norme</h1>
-            <div class="norm-buttons" id="norm-buttons">
-                <button class="norm-btn" onclick="selectNorm('RCC-CW')">RCC-CW</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-E')">RCC-E</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-M')">RCC-M</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-MR')">RCC-MR</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-Mx')">RCC-Mx</button>
-                <button class="norm-btn" onclick="selectNorm('RSE-M')">RSE-M</button>
-            </div>
-            <div id="version-selection" class="hidden">
-                <h2 style="color: white; font-size: 24px; margin-bottom: 20px;" id="version-title"></h2>
-                <div class="version-buttons" id="version-buttons"></div>
-                <button class="back-btn" onclick="goBackToNorms()">← Retour</button>
-            </div>
-        </div>
-    </div>
-    
     <!-- Page de mot de passe -->
-    <div id="password-screen" class="hidden">
+    <div id="password-screen">
         <div class="password-container">
             <h1>Code d'accès</h1>
             <input type="password" id="password-input" class="password-input" placeholder="Entrez le code" autofocus>
@@ -614,6 +594,26 @@
                 <span class="lock-icon lock-open">🔓</span>
             </div>
             <div class="granted-title">Groupe ADF</div>
+        </div>
+    </div>
+    
+    <!-- Sélection de la norme (après authentification) -->
+    <div id="norm-selection-screen" class="hidden">
+        <div class="norm-selection-container">
+            <h1>Sélection de la norme</h1>
+            <div class="norm-buttons" id="norm-buttons">
+                <button class="norm-btn" onclick="selectNorm('RCC-CW')">RCC-CW</button>
+                <button class="norm-btn" onclick="selectNorm('RCC-E')">RCC-E</button>
+                <button class="norm-btn" onclick="selectNorm('RCC-M')">RCC-M</button>
+                <button class="norm-btn" onclick="selectNorm('RCC-MR')">RCC-MR</button>
+                <button class="norm-btn" onclick="selectNorm('RCC-Mx')">RCC-Mx</button>
+                <button class="norm-btn" onclick="selectNorm('RSE-M')">RSE-M</button>
+            </div>
+            <div id="version-selection" class="hidden">
+                <h2 style="color: white; font-size: 24px; margin-bottom: 20px;" id="version-title"></h2>
+                <div class="version-buttons" id="version-buttons"></div>
+                <button class="back-btn" onclick="goBackToNorms()">← Retour</button>
+            </div>
         </div>
     </div>
     <div class="container" id="report-content">
@@ -987,7 +987,7 @@
                     lockContainer.classList.add('unlocked');
                 }, 300);
                 
-                // Masquer la page de mot de passe et afficher le site après l'animation
+                // Masquer la page de mot de passe et afficher la sélection de norme après l'animation
                 setTimeout(() => {
                     passwordScreen.classList.add('hidden');
                     accessGranted.classList.remove('show');
@@ -998,13 +998,8 @@
                     sessionStorage.setItem('auth_time', Date.now().toString());
                     sessionStorage.setItem('authenticated', 'true');
                     sessionStorage.setItem('failedAttempts', '0');
-                    // S'assurer que la norme et version sont sauvegardées
-                    if (!sessionStorage.getItem('selectedNorm')) {
-                        sessionStorage.setItem('selectedNorm', 'RCC-M');
-                    }
-                    if (!sessionStorage.getItem('selectedVersion')) {
-                        sessionStorage.setItem('selectedVersion', 'RCC-M 2024');
-                    }
+                    // Afficher la sélection de norme
+                    document.getElementById('norm-selection-screen').classList.remove('hidden');
                     failedAttempts = 0;
                 }, 1500);
             } else {
@@ -1100,9 +1095,9 @@
             
             // Vérifier si c'est RCC-M 2024 (seule version avec accès au simulateur)
             if (norm === 'RCC-M' && version === 'RCC-M 2024') {
-                // Masquer la sélection de norme et afficher la page de mot de passe
+                // Masquer la sélection de norme et afficher le simulateur
                 document.getElementById('norm-selection-screen').classList.add('hidden');
-                document.getElementById('password-screen').classList.remove('hidden');
+                // Le simulateur est déjà visible dans le conteneur principal
             } else {
                 // Afficher un message pour les autres versions
                 const normScreen = document.getElementById('norm-selection-screen');
@@ -1113,55 +1108,62 @@
                             <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
                             <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
                         </div>
-                        <button class="back-btn" onclick="location.reload()" style="margin-top: 30px;">← Retour au choix</button>
+                        <button class="back-btn" onclick="goBackToNorms()" style="margin-top: 30px;">← Retour au choix</button>
                     </div>
                 `;
             }
         }
         
-        // Vérifier si une norme/version est déjà sélectionnée
+        // Vérifier si déjà authentifié et si une norme/version est sélectionnée
+        const authToken = sessionStorage.getItem('auth_token');
+        const authTime = sessionStorage.getItem('auth_time');
+        const now = Date.now();
         const savedNorm = sessionStorage.getItem('selectedNorm');
         const savedVersion = sessionStorage.getItem('selectedVersion');
         
-        if (savedNorm && savedVersion) {
-            if (savedNorm === 'RCC-M' && savedVersion === 'RCC-M 2024') {
-                // Si RCC-M 2024 est sélectionné, vérifier l'authentification
-                const authToken = sessionStorage.getItem('auth_token');
-                const authTime = sessionStorage.getItem('auth_time');
-                const now = Date.now();
-                
-                if (authToken && authTime && _0xa1b2c3()) {
-                    // Vérifier que le token n'a pas expiré (1 heure)
-                    if ((now - parseInt(authTime)) < 3600000) {
-                        // Vérifier l'intégrité du token
-                        const expectedToken = btoa(btoa('1702' + now.toString().substring(0, 10)));
-                        if (authToken.length > 10) {
-                            document.getElementById('norm-selection-screen').classList.add('hidden');
+        if (authToken && authTime && _0xa1b2c3()) {
+            // Vérifier que le token n'a pas expiré (1 heure)
+            if ((now - parseInt(authTime)) < 3600000) {
+                // Vérifier l'intégrité du token
+                const expectedToken = btoa(btoa('1702' + now.toString().substring(0, 10)));
+                if (authToken.length > 10) {
+                    // Authentifié, vérifier si norme/version sélectionnée
+                    if (savedNorm && savedVersion) {
+                        if (savedNorm === 'RCC-M' && savedVersion === 'RCC-M 2024') {
+                            // Afficher directement le simulateur
                             document.getElementById('password-screen').classList.add('hidden');
-                        } else {
                             document.getElementById('norm-selection-screen').classList.add('hidden');
+                        } else {
+                            // Autre version, afficher le message
+                            document.getElementById('password-screen').classList.add('hidden');
+                            document.getElementById('norm-selection-screen').classList.remove('hidden');
+                            document.getElementById('norm-selection-screen').innerHTML = `
+                                <div class="norm-selection-container">
+                                    <h1>${savedVersion}</h1>
+                                    <div class="not-available-message">
+                                        <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
+                                        <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
+                                    </div>
+                                    <button class="back-btn" onclick="goBackToNorms(); location.reload()" style="margin-top: 30px;">← Retour au choix</button>
+                                </div>
+                            `;
                         }
                     } else {
-                        sessionStorage.removeItem('auth_token');
-                        sessionStorage.removeItem('auth_time');
-                        sessionStorage.setItem('failedAttempts', '0');
-                        document.getElementById('norm-selection-screen').classList.add('hidden');
+                        // Authentifié mais pas de norme/version sélectionnée, afficher la sélection
+                        document.getElementById('password-screen').classList.add('hidden');
+                        document.getElementById('norm-selection-screen').classList.remove('hidden');
                     }
                 } else {
-                    document.getElementById('norm-selection-screen').classList.add('hidden');
+                    document.getElementById('password-screen').classList.add('hidden');
+                    document.getElementById('norm-selection-screen').classList.remove('hidden');
                 }
             } else {
-                // Autre version sélectionnée, afficher le message
-                document.getElementById('norm-selection-screen').innerHTML = `
-                    <div class="norm-selection-container">
-                        <h1>${savedVersion}</h1>
-                        <div class="not-available-message">
-                            <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
-                            <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
-                        </div>
-                        <button class="back-btn" onclick="location.reload()" style="margin-top: 30px;">← Retour au choix</button>
-                    </div>
-                `;
+                // Token expiré, réinitialiser
+                sessionStorage.removeItem('auth_token');
+                sessionStorage.removeItem('auth_time');
+                sessionStorage.removeItem('selectedNorm');
+                sessionStorage.removeItem('selectedVersion');
+                sessionStorage.setItem('failedAttempts', '0');
             }
         }
         
