@@ -384,151 +384,78 @@
             color: #cccccc;
         }
         
-        /* Animation d'accès autorisé style hacker */
+        /* Animation d'accès autorisé */
         #access-granted {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.95);
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 20000;
-            overflow: hidden;
         }
         #access-granted.show {
             display: flex;
-            animation: fadeOut 2.5s ease-out forwards;
+            animation: fadeOut 1.5s ease-out forwards;
         }
         @keyframes fadeOut {
-            0%, 80% { opacity: 1; }
+            0%, 70% { opacity: 1; }
             100% { opacity: 0; }
         }
         .granted-content {
             text-align: center;
-            position: relative;
         }
-        .hacker-text {
-            font-family: 'Courier New', monospace;
-            font-size: 64px;
-            font-weight: bold;
-            color: #00ff00;
-            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
-            letter-spacing: 8px;
+        .lock-container {
+            position: relative;
             margin-bottom: 30px;
-            position: relative;
-            animation: glitch 0.3s infinite;
         }
-        @keyframes glitch {
-            0%, 100% {
-                transform: translate(0);
-                text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
-            }
-            20% {
-                transform: translate(-2px, 2px);
-                text-shadow: -2px 0 10px #ff0000, 2px 0 10px #00ff00;
-            }
-            40% {
-                transform: translate(-2px, -2px);
-                text-shadow: 2px 0 10px #ff0000, -2px 0 10px #00ff00;
-            }
-            60% {
-                transform: translate(2px, 2px);
-                text-shadow: 2px 0 10px #ff0000, -2px 0 10px #00ff00;
-            }
-            80% {
-                transform: translate(2px, -2px);
-                text-shadow: -2px 0 10px #ff0000, 2px 0 10px #00ff00;
-            }
+        .lock-icon {
+            font-size: 80px;
+            animation: lockOpen 1s ease-out;
         }
-        .code-matrix {
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            color: #00ff00;
-            line-height: 1.2;
-            opacity: 0;
-            animation: codeAppear 1s ease-in 0.8s forwards;
-            max-width: 600px;
-            text-align: left;
-            background: rgba(0, 255, 0, 0.05);
-            padding: 20px;
-            border: 1px solid rgba(0, 255, 0, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-        }
-        @keyframes codeAppear {
+        @keyframes lockOpen {
             0% {
+                transform: scale(1) rotate(0deg);
+            }
+            50% {
+                transform: scale(1.1) rotate(-10deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        .lock-closed {
+            display: inline-block;
+        }
+        .lock-open {
+            display: none;
+        }
+        .lock-container.unlocked .lock-closed {
+            display: none;
+        }
+        .lock-container.unlocked .lock-open {
+            display: inline-block;
+        }
+        .granted-title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #2c2c2c;
+            margin-top: 20px;
+            animation: slideIn 0.6s ease-out 0.3s both;
+        }
+        @keyframes slideIn {
+            from {
                 opacity: 0;
                 transform: translateY(20px);
             }
-            100% {
+            to {
                 opacity: 1;
                 transform: translateY(0);
             }
-        }
-        .code-line {
-            margin: 5px 0;
-            animation: typewriter 0.1s steps(20);
-        }
-        @keyframes typewriter {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-        .hacker-dissolve {
-            animation: dissolve 1.2s ease-in forwards;
-        }
-        @keyframes dissolve {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-                filter: blur(0px);
-            }
-            50% {
-                opacity: 0.5;
-                transform: scale(0.95);
-                filter: blur(2px);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.9);
-                filter: blur(5px);
-            }
-        }
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(to bottom, transparent, #00ff00, transparent);
-            animation: scan 2s linear infinite;
-            opacity: 0.5;
-        }
-        @keyframes scan {
-            0% {
-                top: 0;
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                top: 100%;
-                opacity: 0.5;
-            }
-        }
-        .matrix-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.1;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 255, 0, 0.03) 4px);
-            pointer-events: none;
         }
     </style>
 </head>
@@ -552,13 +479,14 @@
         </div>
     </div>
     
-    <!-- Animation d'accès autorisé style hacker -->
+    <!-- Animation d'accès autorisé -->
     <div id="access-granted">
-        <div class="matrix-bg"></div>
-        <div class="scan-line"></div>
         <div class="granted-content">
-            <div class="hacker-text" id="hacker-adf">ADF</div>
-            <div class="code-matrix" id="code-matrix"></div>
+            <div class="lock-container" id="lock-container">
+                <span class="lock-icon lock-closed">🔒</span>
+                <span class="lock-icon lock-open">🔓</span>
+            </div>
+            <div class="granted-title">Groupe ADF</div>
         </div>
     </div>
     <div class="container" id="report-content">
@@ -899,75 +827,44 @@
             const check5 = parseInt(userInput) === (1700 + 2);
             
             if (check1 && check2 && check3 && check4 && check5) {
-                // Afficher l'animation d'accès autorisé style hacker
+                // Afficher l'animation d'accès autorisé
                 const accessGranted = document.getElementById('access-granted');
-                const hackerAdf = document.getElementById('hacker-adf');
-                const codeMatrix = document.getElementById('code-matrix');
+                const lockContainer = document.getElementById('lock-container');
                 
                 accessGranted.classList.add('show');
                 
-                // Son style hacker
+                // Son de succès
                 try {
                     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    // Son électronique style hacker
-                    const oscillator1 = audioContext.createOscillator();
-                    const oscillator2 = audioContext.createOscillator();
+                    const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
                     
-                    oscillator1.connect(gainNode);
-                    oscillator2.connect(gainNode);
+                    oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
                     
-                    oscillator1.frequency.setValueAtTime(440, audioContext.currentTime);
-                    oscillator2.frequency.setValueAtTime(880, audioContext.currentTime);
-                    oscillator1.type = 'square';
-                    oscillator2.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    // Son agréable (deux tons)
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
                     
-                    oscillator1.start(audioContext.currentTime);
-                    oscillator2.start(audioContext.currentTime);
-                    oscillator1.stop(audioContext.currentTime + 0.5);
-                    oscillator2.stop(audioContext.currentTime + 0.5);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
                 } catch(e) {
                     // Ignorer si l'audio n'est pas supporté
                 }
                 
-                // Animation de dissolution de "ADF" en code
+                // Animation du cadenas qui s'ouvre
                 setTimeout(() => {
-                    hackerAdf.classList.add('hacker-dissolve');
-                    
-                    // Générer le code matrix
-                    const codeLines = [
-                        '> INITIALIZING SYSTEM...',
-                        '> AUTHENTICATION SUCCESSFUL',
-                        '> ACCESS LEVEL: ADMIN',
-                        '> USER: ADF',
-                        '> SESSION ID: ' + Math.random().toString(36).substring(2, 15).toUpperCase(),
-                        '> ENCRYPTION: AES-256',
-                        '> STATUS: CONNECTED',
-                        '> LOADING INTERFACE...',
-                        '',
-                        '[████████████████████] 100%'
-                    ];
-                    
-                    codeMatrix.innerHTML = '';
-                    codeLines.forEach((line, index) => {
-                        setTimeout(() => {
-                            const codeLine = document.createElement('div');
-                            codeLine.className = 'code-line';
-                            codeLine.textContent = line;
-                            codeMatrix.appendChild(codeLine);
-                        }, index * 100);
-                    });
-                }, 500);
+                    lockContainer.classList.add('unlocked');
+                }, 300);
                 
                 // Masquer la page de mot de passe et afficher le site après l'animation
                 setTimeout(() => {
                     passwordScreen.classList.add('hidden');
                     accessGranted.classList.remove('show');
-                    hackerAdf.classList.remove('hacker-dissolve');
-                    codeMatrix.innerHTML = '';
+                    lockContainer.classList.remove('unlocked');
                     // Créer un token d'authentification sécurisé
                     const token = btoa(btoa('1702' + Date.now().toString().substring(0, 10)));
                     sessionStorage.setItem('auth_token', token);
@@ -975,7 +872,7 @@
                     sessionStorage.setItem('authenticated', 'true');
                     sessionStorage.setItem('failedAttempts', '0');
                     failedAttempts = 0;
-                }, 2500);
+                }, 1500);
             } else {
                 failedAttempts++;
                 sessionStorage.setItem('failedAttempts', failedAttempts.toString());
