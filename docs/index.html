@@ -246,16 +246,16 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
         .btn-pdf {
-            background: #dc3545;
+            background: #2c2c2c;
         }
         .btn-pdf:hover {
-            background: #c82333;
+            background: #3c3c3c;
         }
         .btn-print {
-            background: #28a745;
+            background: #2c2c2c;
         }
         .btn-print:hover {
-            background: #218838;
+            background: #3c3c3c;
         }
         .info-grid {
             display: grid;
@@ -1137,26 +1137,54 @@
 
         async function exportPDF() {
             try {
+                // Vérifier que les bibliothèques sont chargées
+                if (typeof html2canvas === 'undefined') {
+                    alert('Erreur : La bibliothèque html2canvas n\'est pas chargée. Veuillez recharger la page.');
+                    return;
+                }
+                
+                if (typeof window.jspdf === 'undefined') {
+                    alert('Erreur : La bibliothèque jsPDF n\'est pas chargée. Veuillez recharger la page.');
+                    return;
+                }
+
                 const element = document.getElementById('report-content');
+                if (!element) {
+                    alert('Erreur : Élément non trouvé.');
+                    return;
+                }
+
+                // Afficher un message de chargement
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '⏳ Génération...';
+                btn.disabled = true;
+
                 const canvas = await html2canvas(element, {
-                    scale: 2,
+                    scale: 1.5,
                     useCORS: true,
-                    logging: false
+                    logging: false,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff'
                 });
 
-                const imgData = canvas.toDataURL('image/png');
+                const imgData = canvas.toDataURL('image/png', 1.0);
+                
+                // Utiliser jsPDF correctement
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
-                const imgWidth = 210;
-                const pageHeight = 297;
+                const imgWidth = 210; // Largeur A4 en mm
+                const pageHeight = 297; // Hauteur A4 en mm
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 let heightLeft = imgHeight;
                 let position = 0;
 
+                // Première page
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
 
+                // Pages supplémentaires si nécessaire
                 while (heightLeft >= 0) {
                     position = heightLeft - imgHeight;
                     pdf.addPage();
@@ -1165,9 +1193,20 @@
                 }
 
                 pdf.save('rapport-rcc-m.pdf');
+                
+                // Restaurer le bouton
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             } catch (error) {
-                alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
-                console.error(error);
+                alert('Erreur lors de l\'export PDF : ' + error.message);
+                console.error('Erreur PDF:', error);
+                
+                // Restaurer le bouton en cas d'erreur
+                const btn = event.target;
+                if (btn) {
+                    btn.innerHTML = '📄 Exporter PDF';
+                    btn.disabled = false;
+                }
             }
         }
     </script>
