@@ -348,7 +348,7 @@
         .password-error.show {
             display: block;
         }
-        /* Effet d'accès refusé */
+        /* Effet d'accès refusé simple */
         #access-denied {
             position: fixed;
             top: 0;
@@ -361,57 +361,85 @@
             justify-content: center;
             align-items: center;
             z-index: 20000;
-            animation: flash 0.3s infinite;
         }
         #access-denied.show {
             display: flex;
         }
-        @keyframes flash {
-            0%, 100% { background: #000000; }
-            50% { background: #8b0000; }
-        }
         .denied-content {
             text-align: center;
-            animation: shake 0.5s infinite;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-            20%, 40%, 60%, 80% { transform: translateX(10px); }
         }
         .denied-title {
-            font-size: 72px;
+            font-size: 48px;
             font-weight: bold;
             color: #ff0000;
-            text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000, 0 0 60px #ff0000;
-            margin-bottom: 30px;
-            letter-spacing: 10px;
-            animation: pulse 1s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.9; }
-        }
-        .denied-subtitle {
-            font-size: 24px;
-            color: #ff4444;
             margin-bottom: 20px;
-            text-transform: uppercase;
         }
         .denied-message {
             font-size: 18px;
             color: #cccccc;
-            margin-top: 40px;
-            opacity: 0.8;
         }
-        .denied-icon {
-            font-size: 100px;
-            margin-bottom: 30px;
-            animation: rotate 2s linear infinite;
+        
+        /* Animation d'accès autorisé */
+        #access-granted {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
         }
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        #access-granted.show {
+            display: flex;
+            animation: fadeOut 1.5s ease-out forwards;
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        .granted-content {
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .granted-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: checkmark 0.6s ease-out;
+        }
+        @keyframes checkmark {
+            0% {
+                transform: scale(0) rotate(-45deg);
+            }
+            50% {
+                transform: scale(1.2) rotate(-45deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        .granted-title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #4caf50;
+            margin-bottom: 10px;
+        }
+        .granted-message {
+            font-size: 18px;
+            color: #cccccc;
         }
     </style>
 </head>
@@ -430,10 +458,17 @@
     <!-- Écran d'accès refusé -->
     <div id="access-denied">
         <div class="denied-content">
-            <div class="denied-icon">🚫</div>
             <div class="denied-title">ACCÈS REFUSÉ</div>
-            <div class="denied-subtitle">Tentatives multiples échouées</div>
-            <div class="denied-message">Système verrouillé pour raisons de sécurité</div>
+            <div class="denied-message">Trop de tentatives échouées</div>
+        </div>
+    </div>
+    
+    <!-- Animation d'accès autorisé -->
+    <div id="access-granted">
+        <div class="granted-content">
+            <div class="granted-icon">✓</div>
+            <div class="granted-title">ACCÈS AUTORISÉ</div>
+            <div class="granted-message">Chargement...</div>
         </div>
     </div>
     <div class="container" id="report-content">
@@ -592,53 +627,59 @@
             const accessDenied = document.getElementById('access-denied');
             
             if (input.value === CORRECT_PASSWORD) {
-                passwordScreen.classList.add('hidden');
-                // Réinitialiser les tentatives
-                sessionStorage.setItem('authenticated', 'true');
-                sessionStorage.setItem('failedAttempts', '0');
-                failedAttempts = 0;
+                // Afficher l'animation d'accès autorisé
+                const accessGranted = document.getElementById('access-granted');
+                accessGranted.classList.add('show');
+                
+                // Son de succès
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    // Son agréable (deux tons)
+                    oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // Do
+                    oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1); // Mi
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch(e) {
+                    // Ignorer si l'audio n'est pas supporté
+                }
+                
+                // Masquer la page de mot de passe et afficher le site après l'animation
+                setTimeout(() => {
+                    passwordScreen.classList.add('hidden');
+                    accessGranted.classList.remove('show');
+                    // Réinitialiser les tentatives
+                    sessionStorage.setItem('authenticated', 'true');
+                    sessionStorage.setItem('failedAttempts', '0');
+                    failedAttempts = 0;
+                }, 1500);
             } else {
                 failedAttempts++;
                 sessionStorage.setItem('failedAttempts', failedAttempts.toString());
                 
                 if (failedAttempts >= MAX_ATTEMPTS) {
-                    // Afficher l'écran d'accès refusé
+                    // Afficher l'écran d'accès refusé simple
                     passwordScreen.classList.add('hidden');
                     accessDenied.classList.add('show');
                     
-                    // Empêcher toute interaction
-                    document.body.style.pointerEvents = 'none';
-                    
-                    // Son d'alerte (si le navigateur le permet)
-                    try {
-                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        const oscillator = audioContext.createOscillator();
-                        const gainNode = audioContext.createGain();
-                        
-                        oscillator.connect(gainNode);
-                        gainNode.connect(audioContext.destination);
-                        
-                        oscillator.frequency.value = 200;
-                        oscillator.type = 'square';
-                        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                        
-                        oscillator.start(audioContext.currentTime);
-                        oscillator.stop(audioContext.currentTime + 0.5);
-                    } catch(e) {
-                        // Ignorer si l'audio n'est pas supporté
-                    }
-                    
-                    // Réinitialiser après 10 secondes (optionnel)
+                    // Réinitialiser après 5 secondes
                     setTimeout(() => {
                         accessDenied.classList.remove('show');
                         passwordScreen.classList.remove('hidden');
-                        document.body.style.pointerEvents = 'auto';
                         sessionStorage.setItem('failedAttempts', '0');
                         failedAttempts = 0;
                         input.value = '';
                         input.focus();
-                    }, 10000);
+                    }, 5000);
                 } else {
                     error.classList.add('show');
                     error.textContent = `Code incorrect. Tentatives restantes : ${MAX_ATTEMPTS - failedAttempts}`;
