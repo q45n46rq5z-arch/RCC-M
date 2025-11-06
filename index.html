@@ -1084,8 +1084,30 @@
         
         function goBackToNorms() {
             selectedNorm = null;
-            document.getElementById('norm-buttons').style.display = 'grid';
-            document.getElementById('version-selection').classList.add('hidden');
+            selectedVersion = null;
+            sessionStorage.removeItem('selectedNorm');
+            sessionStorage.removeItem('selectedVersion');
+            
+            // Restaurer l'écran de sélection de norme
+            const normScreen = document.getElementById('norm-selection-screen');
+            normScreen.innerHTML = `
+                <div class="norm-selection-container">
+                    <h1>Sélection de la norme</h1>
+                    <div class="norm-buttons" id="norm-buttons">
+                        <button class="norm-btn" onclick="selectNorm('RCC-CW')">RCC-CW</button>
+                        <button class="norm-btn" onclick="selectNorm('RCC-E')">RCC-E</button>
+                        <button class="norm-btn" onclick="selectNorm('RCC-M')">RCC-M</button>
+                        <button class="norm-btn" onclick="selectNorm('RCC-MR')">RCC-MR</button>
+                        <button class="norm-btn" onclick="selectNorm('RCC-Mx')">RCC-Mx</button>
+                        <button class="norm-btn" onclick="selectNorm('RSE-M')">RSE-M</button>
+                    </div>
+                    <div id="version-selection" class="hidden">
+                        <h2 style="color: white; font-size: 24px; margin-bottom: 20px;" id="version-title"></h2>
+                        <div class="version-buttons" id="version-buttons"></div>
+                        <button class="back-btn" onclick="goBackToNorms()">← Retour</button>
+                    </div>
+                </div>
+            `;
         }
         
         function selectVersion(norm, version) {
@@ -1144,7 +1166,7 @@
                                         <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
                                         <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
                                     </div>
-                                    <button class="back-btn" onclick="goBackToNorms(); location.reload()" style="margin-top: 30px;">← Retour au choix</button>
+                                    <button class="back-btn" onclick="goBackToNorms()" style="margin-top: 30px;">← Retour au choix</button>
                                 </div>
                             `;
                         }
