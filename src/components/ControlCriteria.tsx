@@ -173,7 +173,7 @@ export default function ControlCriteria({ criteria, onChange }: ControlCriteriaP
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Refuser si perte d'écho > (dB)
+                    Refuser si perte d'écho &gt; (dB)
                   </label>
                   <input
                     type="number"
