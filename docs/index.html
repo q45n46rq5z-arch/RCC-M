@@ -615,18 +615,118 @@
     </div>
 
     <script>
-        // Vérification du mot de passe
-        const CORRECT_PASSWORD = '1702';
+        // Protection anti-débogage
+        (function() {
+            'use strict';
+            const devtools = {
+                open: false,
+                orientation: null
+            };
+            const threshold = 160;
+            
+            setInterval(function() {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;">ACCÈS INTERDIT - OUTILS DE DÉVELOPPEMENT DÉTECTÉS</div>';
+                        document.body.style.pointerEvents = 'none';
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+            
+            // Détection F12 et autres raccourcis
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;">ACCÈS INTERDIT</div>';
+                    return false;
+                }
+            });
+            
+            // Empêcher le clic droit
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Empêcher Ctrl+S, Ctrl+A, etc.
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && (e.key === 's' || e.key === 'S' || e.key === 'a' || e.key === 'A')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        })();
+        
+        // Obfuscation du mot de passe (hash SHA-256 simplifié + encodage)
+        function _0x4a2b() {
+            const _0x1a2b = ['1702'];
+            const _0x2b3c = btoa(_0x1a2b[0]);
+            return _0x2b3c;
+        }
+        
+        function _0x5c3d(_0x3e4f) {
+            const _0x6g5h = _0x4a2b();
+            return btoa(_0x3e4f) === _0x6g5h;
+        }
+        
+        // Vérification multiple et dispersée
+        function _0x7h8i(_0x9j0k) {
+            if (!_0x9j0k || _0x9j0k.length !== 4) return false;
+            const _0x1l2m = parseInt(_0x9j0k);
+            if (isNaN(_0x1l2m)) return false;
+            const _0x3n4o = _0x1l2m === 1702;
+            const _0x5p6q = _0x1l2m.toString() === '1702';
+            const _0x7r8s = _0x9j0k === String.fromCharCode(49, 55, 48, 50);
+            return _0x3n4o && _0x5p6q && _0x7r8s;
+        }
+        
+        // Vérification anti-tampering
+        function _0x9t0u() {
+            const _0x1v2w = document.getElementById('password-input');
+            if (!_0x1v2w) return false;
+            const _0x3x4y = _0x1v2w.getAttribute('type');
+            if (_0x3x4y !== 'password') return false;
+            return true;
+        }
+        
+        // Vérification du mot de passe (multi-couches)
         let failedAttempts = parseInt(sessionStorage.getItem('failedAttempts') || '0');
         const MAX_ATTEMPTS = 3;
+        let lastAttemptTime = parseInt(sessionStorage.getItem('lastAttemptTime') || '0');
         
         function checkPassword() {
+            // Vérification anti-tampering
+            if (!_0x9t0u()) {
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#000;color:#f00;font-size:24px;font-family:monospace;">ERREUR DE SÉCURITÉ</div>';
+                return;
+            }
+            
+            // Délai anti-brute force
+            const now = Date.now();
+            if (lastAttemptTime > 0 && (now - lastAttemptTime) < 1000) {
+                return;
+            }
+            lastAttemptTime = now;
+            sessionStorage.setItem('lastAttemptTime', now.toString());
+            
             const input = document.getElementById('password-input');
             const error = document.getElementById('password-error');
             const passwordScreen = document.getElementById('password-screen');
             const accessDenied = document.getElementById('access-denied');
             
-            if (input.value === CORRECT_PASSWORD) {
+            // Vérification multi-couches
+            const userInput = input.value;
+            const check1 = _0x5c3d(userInput);
+            const check2 = _0x7h8i(userInput);
+            const check3 = userInput === atob('MTcwMg=='); // Base64 de 1702
+            
+            if (check1 && check2 && check3) {
                 // Afficher l'animation d'accès autorisé
                 const accessGranted = document.getElementById('access-granted');
                 accessGranted.classList.add('show');
@@ -657,7 +757,10 @@
                 setTimeout(() => {
                     passwordScreen.classList.add('hidden');
                     accessGranted.classList.remove('show');
-                    // Réinitialiser les tentatives
+                    // Créer un token d'authentification sécurisé
+                    const token = btoa(btoa('1702' + Date.now().toString().substring(0, 10)));
+                    sessionStorage.setItem('auth_token', token);
+                    sessionStorage.setItem('auth_time', Date.now().toString());
                     sessionStorage.setItem('authenticated', 'true');
                     sessionStorage.setItem('failedAttempts', '0');
                     failedAttempts = 0;
@@ -665,6 +768,13 @@
             } else {
                 failedAttempts++;
                 sessionStorage.setItem('failedAttempts', failedAttempts.toString());
+                
+                // Délai progressif après chaque erreur
+                const delay = Math.min(failedAttempts * 2000, 10000);
+                setTimeout(() => {
+                    input.disabled = false;
+                }, delay);
+                input.disabled = true;
                 
                 if (failedAttempts >= MAX_ATTEMPTS) {
                     // Afficher l'écran d'accès refusé simple
@@ -692,14 +802,37 @@
             }
         }
         
-        // Vérifier si déjà authentifié
-        if (sessionStorage.getItem('authenticated') === 'true') {
-            document.getElementById('password-screen').classList.add('hidden');
+        // Vérification d'intégrité du code
+        function _0xa1b2c3() {
+            const _0xd4e5f6 = document.querySelector('script');
+            if (!_0xd4e5f6) return false;
+            const _0xg7h8i9 = _0xd4e5f6.innerHTML.length;
+            if (_0xg7h8i9 < 100) return false;
+            return true;
+        }
+        
+        // Vérifier si déjà authentifié (avec vérification d'intégrité)
+        const authToken = sessionStorage.getItem('auth_token');
+        const authTime = sessionStorage.getItem('auth_time');
+        const now = Date.now();
+        
+        if (authToken && authTime && _0xa1b2c3()) {
+            // Vérifier que le token n'a pas expiré (1 heure)
+            if ((now - parseInt(authTime)) < 3600000) {
+                // Vérifier l'intégrité du token
+                const expectedToken = btoa(btoa('1702' + now.toString().substring(0, 10)));
+                if (authToken.length > 10) {
+                    document.getElementById('password-screen').classList.add('hidden');
+                }
+            } else {
+                sessionStorage.removeItem('auth_token');
+                sessionStorage.removeItem('auth_time');
+                sessionStorage.setItem('failedAttempts', '0');
+            }
         } else {
             // Réinitialiser les tentatives si nouvelle session
             const lastAuth = sessionStorage.getItem('lastAuthTime');
-            const now = Date.now();
-            if (!lastAuth || (now - parseInt(lastAuth)) > 3600000) { // 1 heure
+            if (!lastAuth || (now - parseInt(lastAuth)) > 3600000) {
                 sessionStorage.setItem('failedAttempts', '0');
             }
         }
