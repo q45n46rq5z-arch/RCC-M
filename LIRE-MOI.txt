@@ -1,0 +1,33 @@
+═══════════════════════════════════════════════════════
+  SIMULATEUR RCC-M - VERSION SIMPLE
+═══════════════════════════════════════════════════════
+
+✅ POUR TESTER (SANS INSTALLATION) :
+
+1. Ouvrez le fichier "index-simple.html" dans votre navigateur
+   (double-cliquez dessus ou faites clic droit > Ouvrir avec > Navigateur)
+
+2. C'est tout ! Ça marche directement.
+
+═══════════════════════════════════════════════════════
+
+📝 POUR MODIFIER :
+
+- Ouvrez "index-simple.html" avec un éditeur de texte
+- Modifiez ce que vous voulez
+- Sauvegardez et rechargez la page dans le navigateur
+
+═══════════════════════════════════════════════════════
+
+🚀 POUR METTRE EN LIGNE :
+
+1. Uploadez juste le fichier "index-simple.html" sur :
+   - GitHub Pages (gratuit)
+   - Netlify Drop (glissez-déposez le fichier)
+   - Vercel (glissez-déposez le fichier)
+   - N'importe quel hébergeur web
+
+2. Vous aurez un lien direct qui fonctionne !
+
+═══════════════════════════════════════════════════════
+

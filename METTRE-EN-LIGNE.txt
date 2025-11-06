@@ -1,0 +1,35 @@
+═══════════════════════════════════════════════════════
+  COMMENT METTRE EN LIGNE (OBTENIR UN LIEN)
+═══════════════════════════════════════════════════════
+
+✅ MÉTHODE LA PLUS SIMPLE : Netlify Drop
+
+1. Allez sur : https://app.netlify.com/drop
+2. Glissez-déposez le fichier "index.html"
+3. Vous obtenez un lien immédiatement !
+   Exemple : https://random-name-123.netlify.app
+
+═══════════════════════════════════════════════════════
+
+✅ AUTRE MÉTHODE : GitHub Pages
+
+1. Créez un compte GitHub (gratuit)
+2. Créez un nouveau dépôt
+3. Uploadez le fichier "index.html"
+4. Allez dans Settings > Pages
+5. Activez GitHub Pages
+6. Votre lien : https://votre-username.github.io/nom-du-depot
+
+═══════════════════════════════════════════════════════
+
+✅ ENCORE PLUS SIMPLE : Surge.sh
+
+1. Installez : npm install -g surge
+2. Dans le dossier, tapez : surge
+3. Suivez les instructions
+4. Vous obtenez un lien comme : https://votre-nom.surge.sh
+
+═══════════════════════════════════════════════════════
+
+💡 RECOMMANDATION : Utilisez Netlify Drop, c'est le plus rapide !
+

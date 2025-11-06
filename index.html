@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur RCC-M - Groupe ADF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #e8e8e8;
+            padding: 20px;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .header {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px 10px 0 0;
+            border-bottom: 3px solid #2c2c2c;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        .header-left h1 {
+            color: #333;
+            font-size: 28px;
+            margin: 0;
+        }
+        .header-right {
+            text-align: right;
+            color: #666;
+            font-size: 12px;
+        }
+        .header-right strong {
+            color: #2c2c2c;
+            display: block;
+            margin-bottom: 3px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .content {
+            padding: 30px;
+        }
+        h2 {
+            color: #333;
+            margin: 30px 0 20px 0;
+            font-size: 22px;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2c2c2c;
+        }
+        h3 {
+            color: #444;
+            margin: 20px 0 15px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        h4 {
+            color: #555;
+            margin: 15px 0 10px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 18px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #333;
+        }
+        .btn:hover {
+            border-color: #2c2c2c;
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .btn.selected {
+            border-color: #2c2c2c;
+            background: #2c2c2c;
+            color: white;
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2c2c2c;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checklist-item:hover {
+            border-color: #2c2c2c;
+            background: #f5f5f5;
+        }
+        .checklist-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+            accent-color: #2c2c2c;
+        }
+        .checklist-item.checked {
+            background: #e8f5e9;
+            border-color: #4caf50;
+        }
+        .checklist-item.checked input[type="checkbox"] {
+            accent-color: #4caf50;
+        }
+        .field {
+            margin: 15px 0;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+        .field input, .field select, .field textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .field input:focus, .field select:focus, .field textarea:focus {
+            outline: none;
+            border-color: #2c2c2c;
+        }
+        .steps {
+            list-style: none;
+            margin-top: 10px;
+        }
+        .steps li {
+            margin: 10px 0;
+            padding: 12px 15px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            border-left: 4px solid #2c2c2c;
+            position: relative;
+            padding-left: 40px;
+        }
+        .steps li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 12px;
+            background: #2c2c2c;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .steps {
+            counter-reset: step-counter;
+        }
+        .plans {
+            list-style: none;
+            margin-top: 10px;
+        }
+        .plans li {
+            margin: 8px 0;
+            padding: 12px 15px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            padding-left: 40px;
+            position: relative;
+        }
+        .plans li:before {
+            content: "✓";
+            position: absolute;
+            left: 15px;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .hidden {
+            display: none;
+        }
+        .action-buttons {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        .action-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            color: white;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .btn-pdf {
+            background: #dc3545;
+        }
+        .btn-pdf:hover {
+            background: #c82333;
+        }
+        .btn-print {
+            background: #28a745;
+        }
+        .btn-print:hover {
+            background: #218838;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #e0e0e0;
+        }
+        .info-card label {
+            display: block;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .info-card input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="report-content">
+        <div class="header">
+            <div class="header-left">
+                <h1>Simulateur RCC-M</h1>
+            </div>
+            <div class="header-right">
+                <strong>Groupe ADF</strong>
+                <span>Michoux Baptiste</span>
+            </div>
+        </div>
+        <div class="content">
+            <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Gestion et contrôle des pièces industrielles selon les normes RCC-M</p>
+
+            <!-- Choix du type -->
+            <h2>1️⃣ Choix du type de produit</h2>
+            <div class="buttons">
+                <button class="btn" onclick="selectType('forged')">🔨 Pièce forgée</button>
+                <button class="btn" onclick="selectType('cast')">🏭 Pièce moulée</button>
+                <button class="btn" onclick="selectType('sheet')">📄 Tôle</button>
+                <button class="btn" onclick="selectType('tube')">🔧 Tube</button>
+                <button class="btn" onclick="selectType('other')">📦 Autre</button>
+            </div>
+
+            <!-- Configuration -->
+            <div id="configSection" class="hidden">
+                <h2>2️⃣ Configuration</h2>
+                <div id="configContent"></div>
+            </div>
+
+            <!-- Contrôles -->
+            <div id="controlsSection" class="hidden">
+                <h2>3️⃣ Contrôles et critères de notation</h2>
+                
+                <div class="section">
+                    <h3>Radiographie</h3>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" onchange="updateCheck(this)"> 
+                        <span>Refuser criques</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" onchange="updateCheck(this)"> 
+                        <span>Refuser fissures</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" onchange="updateCheck(this)"> 
+                        <span>Refuser restes de support</span>
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" onchange="updateCheck(this)"> 
+                        <span>Refuser refroidisseurs internes</span>
+                    </div>
+                    <div class="field" style="margin-top: 15px;">
+                        <label>Niveaux de sévérité (NF EN 12681-1)</label>
+                        <input type="text" placeholder="Ex: Niveau 2">
+                    </div>
+                    <div class="field">
+                        <label>Cas particuliers (aciers moulés ≤ 25,4 mm → ASTM E192)</label>
+                        <input type="text" placeholder="Si applicable">
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Ultrasons</h3>
+                    <div class="field">
+                        <label>Type d'acier</label>
+                        <select>
+                            <option>Aciers non alliés / faiblement alliés / martensitiques</option>
+                            <option>Aciers austénitiques</option>
+                        </select>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <label>Refuser si écho ≥ (%)</label>
+                            <input type="number" value="50">
+                        </div>
+                        <div class="info-card">
+                            <label>Refuser si perte d'écho > (dB)</label>
+                            <input type="number" value="18">
+                        </div>
+                        <div class="info-card">
+                            <label>Refuser si surface défaut ≥ (mm²)</label>
+                            <input type="number" value="1000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Décision -->
+            <div id="decisionSection" class="hidden">
+                <h2>4️⃣ Décision pour la pièce type</h2>
+                <div class="section">
+                    <div class="checklist-item" onclick="selectRadio(this, 'acceptable')">
+                        <input type="radio" name="defects" value="acceptable">
+                        <div>
+                            <strong>Défauts aléatoires limités</strong><br>
+                            <small style="color: #666;">→ Acceptable</small>
+                        </div>
+                    </div>
+                    <div class="checklist-item" onclick="selectRadio(this, 'improve')">
+                        <input type="radio" name="defects" value="improve">
+                        <div>
+                            <strong>Défauts rares liés au moulage</strong><br>
+                            <small style="color: #666;">→ Méthode à améliorer</small>
+                        </div>
+                    </div>
+                    <div class="checklist-item" onclick="selectRadio(this, 'new')">
+                        <input type="radio" name="defects" value="new">
+                        <div>
+                            <strong>Défauts nombreux</strong><br>
+                            <small style="color: #666;">→ Nouvelle pièce type obligatoire</small>
+                        </div>
+                    </div>
+                </div>
+
+                <h2>5️⃣ Examens surfaciques</h2>
+                <div class="section">
+                    <div class="field">
+                        <label>Référence à la spécification technique</label>
+                        <input type="text" placeholder="Référence">
+                    </div>
+                    <div class="checklist-item" onclick="toggleCheck(this)">
+                        <input type="checkbox" onchange="updateCheck(this)"> 
+                        <span>Réparations majeures multiples → Pièce à requalifier</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dossier -->
+            <div id="dossierSection" class="hidden">
+                <h2>6️⃣ Dossier de pièce type</h2>
+                <div class="section">
+                    <div id="checklist"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="action-buttons no-print">
+        <button class="action-btn btn-pdf" onclick="exportPDF()">📄 Exporter PDF</button>
+        <button class="action-btn btn-print" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+
+    <script>
+        function toggleCheck(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                checkbox.checked = !checkbox.checked;
+                updateCheck(checkbox);
+            }
+        }
+
+        function updateCheck(checkbox) {
+            const item = checkbox.closest('.checklist-item');
+            if (checkbox.checked) {
+                item.classList.add('checked');
+            } else {
+                item.classList.remove('checked');
+            }
+        }
+
+        function selectRadio(element, value) {
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                document.querySelectorAll('.checklist-item').forEach(item => {
+                    if (item.querySelector('input[type="radio"]') === radio) {
+                        item.style.background = '#f0f0f0';
+                        item.style.borderColor = '#2c2c2c';
+                    } else if (item.querySelector('input[type="radio"]')) {
+                        item.style.background = 'white';
+                        item.style.borderColor = '#e0e0e0';
+                    }
+                });
+            }
+        }
+
+        const configs = {
+            forged: {
+                title: 'Pièce forgée',
+                fields: [
+                    {label: 'Nature des entrées', type: 'text'},
+                    {label: 'Mode/type d\'élaboration', type: 'text'},
+                    {label: 'Analyse chimique visée', type: 'text'},
+                    {label: 'Masse/type de lingot', type: 'text'},
+                    {label: '% chutes tête/pied', type: 'text'},
+                    {label: 'Position dans le lingot', type: 'text'}
+                ],
+                steps: [
+                    'Élaboration',
+                    'Forgeage',
+                    'Usinage',
+                    'Traitements thermiques',
+                    'Prélèvements d\'échantillons',
+                    'Contrôles non destructifs'
+                ],
+                plans: [
+                    'Pièce brute',
+                    'Profil thermique',
+                    'Profil livraison',
+                    'Plan de prélèvements'
+                ]
+            },
+            cast: {
+                title: 'Pièce moulée',
+                fields: [
+                    {label: 'Nature des entrées/sables de contact', type: 'text'},
+                    {label: 'Mode/type d\'élaboration', type: 'text'},
+                    {label: 'Analyse chimique', type: 'text'},
+                    {label: 'Principe de moulage', type: 'text'},
+                    {label: 'Position des échantillons', type: 'text'}
+                ],
+                steps: [
+                    'Étuvage',
+                    'Élaboration',
+                    'Coulée',
+                    'Démoulage',
+                    'Réparations',
+                    'Usinage',
+                    'Traitements thermiques',
+                    'Contrôles non destructifs'
+                ],
+                plans: [
+                    'Pièce brute',
+                    'Traitement thermique',
+                    'Livraison',
+                    'Plan de prélèvements'
+                ]
+            },
+            sheet: {
+                title: 'Tôle',
+                fields: [
+                    {label: 'Nature des entrées', type: 'text'},
+                    {label: 'Type d\'élaboration', type: 'text'},
+                    {label: 'Analyse chimique', type: 'text'},
+                    {label: 'Masse/type de lingot', type: 'text'},
+                    {label: '% chutes tête/pied', type: 'text'},
+                    {label: 'Position dans le lingot (direction de laminage)', type: 'text'}
+                ],
+                steps: [
+                    'Élaboration',
+                    'Ébauchage',
+                    'Laminage',
+                    'Traitement thermique',
+                    'Prélèvements',
+                    'Contrôles non destructifs',
+                    'Sens de corroyage',
+                    'Traitements thermiques finaux'
+                ],
+                plans: ['Plan de prélèvements']
+            },
+            tube: {
+                title: 'Tube',
+                fields: [
+                    {label: 'Nature des entrées', type: 'text'},
+                    {label: 'Type d\'élaboration', type: 'text'},
+                    {label: 'Analyse chimique', type: 'text'},
+                    {label: 'Masse/type de lingot', type: 'text'},
+                    {label: '% chutes tête/pied', type: 'text'}
+                ],
+                steps: [
+                    'Élaboration/refusion',
+                    'Forgeage ou laminage à chaud',
+                    'Écroutage',
+                    'Usinage',
+                    'Forage ou extrusion (si applicable)',
+                    'Laminage/étirage à froid',
+                    'Traitement thermique',
+                    'Parachèvement',
+                    'Contrôles non destructifs'
+                ],
+                plans: ['Plans et prélèvements']
+            },
+            other: {
+                title: 'Autre type',
+                fields: [
+                    {label: 'Nature des entrées', type: 'text'},
+                    {label: 'Type d\'élaboration', type: 'text'},
+                    {label: 'Analyse chimique', type: 'text'}
+                ],
+                steps: ['S\'inspirer des conditions du type le plus proche (forgé, moulé, tôle ou tube)'],
+                plans: []
+            }
+        };
+
+        const checklist = [
+            'Programme de fabrication complet',
+            'Plan de moulage',
+            'Plan de contrôle radiographique',
+            'Résultats d\'examens (volumiques, surfaciques, dimensionnels)',
+            'Analyse des défauts selon M163',
+            'Documents des pièces successives'
+        ];
+
+        function selectType(type) {
+            // Mettre à jour les boutons
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            // Afficher la configuration
+            const config = configs[type];
+            let html = '<h3>' + config.title + '</h3>';
+            
+            // Champs simplifiés
+            html += '<div class="section"><h4>Informations principales</h4>';
+            html += '<div class="info-grid">';
+            config.fields.forEach(function(field) {
+                html += '<div class="info-card">';
+                html += '<label>' + field.label + '</label>';
+                html += '<input type="' + field.type + '" placeholder="' + field.label + '">';
+                html += '</div>';
+            });
+            html += '</div></div>';
+
+            // Étapes
+            html += '<div class="section"><h4>Étapes de fabrication</h4><ol class="steps">';
+            config.steps.forEach(function(step) {
+                html += '<li>' + step + '</li>';
+            });
+            html += '</ol></div>';
+
+            // Plans
+            if (config.plans.length > 0) {
+                html += '<div class="section"><h4>Croquis et plans</h4><ul class="plans">';
+                config.plans.forEach(function(plan) {
+                    html += '<li>' + plan + '</li>';
+                });
+                html += '</ul></div>';
+            }
+
+            document.getElementById('configContent').innerHTML = html;
+            document.getElementById('configSection').classList.remove('hidden');
+            document.getElementById('controlsSection').classList.remove('hidden');
+            document.getElementById('decisionSection').classList.remove('hidden');
+            
+            // Checklist
+            let checklistHtml = '';
+            checklist.forEach(function(item) {
+                checklistHtml += '<div class="checklist-item" onclick="toggleCheck(this)"><input type="checkbox" onchange="updateCheck(this)"> <span>' + item + '</span></div>';
+            });
+            document.getElementById('checklist').innerHTML = checklistHtml;
+            document.getElementById('dossierSection').classList.remove('hidden');
+        }
+
+        async function exportPDF() {
+            try {
+                const element = document.getElementById('report-content');
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                pdf.save('rapport-rcc-m.pdf');
+            } catch (error) {
+                alert('Erreur lors de l\'export PDF. Veuillez réessayer.');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
