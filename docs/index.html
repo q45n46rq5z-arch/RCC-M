@@ -306,25 +306,25 @@
         }
         .steps li {
             margin: 10px 0;
-            padding: 12px 16px;
+            padding: 12px 18px;
             background: rgba(29, 78, 216, 0.06);
             border-radius: 14px;
             border: 1px solid rgba(29, 78, 216, 0.18);
             position: relative;
-            padding-left: 40px;
+            padding-left: 70px;
             color: var(--text-main);
         }
         .steps li:before {
             content: counter(step-counter);
             counter-increment: step-counter;
             position: absolute;
-            left: 12px;
+            left: 20px;
             top: 50%;
             transform: translateY(-50%);
             background: linear-gradient(135deg, var(--primary-500), var(--accent-300));
             color: white;
-            width: 28px;
-            height: 28px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -1980,25 +1980,68 @@
             const steps = cloned.querySelectorAll('.steps li');
             steps.forEach((li, idx) => {
                 const txt = li.textContent.replace(/\s+/g, ' ').trim();
-                li.innerHTML = `${String(idx + 1).padStart(2, '0')} · ${txt}`;
+                li.innerHTML = '';
                 li.style.borderLeft = 'none';
                 li.style.backgroundColor = 'transparent';
                 li.style.padding = '5px 0';
                 li.style.paddingLeft = '0';
                 li.style.marginLeft = '0';
                 li.style.pageBreakInside = 'avoid';
-                li.style.fontWeight = '500';
+
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                row.style.gap = '10px';
+
+                const badge = document.createElement('span');
+                badge.textContent = String(idx + 1).padStart(2, '0');
+                badge.style.display = 'inline-flex';
+                badge.style.alignItems = 'center';
+                badge.style.justifyContent = 'center';
+                badge.style.minWidth = '26px';
+                badge.style.height = '26px';
+                badge.style.borderRadius = '999px';
+                badge.style.backgroundColor = '#1f2937';
+                badge.style.color = '#ffffff';
+                badge.style.fontSize = '11px';
+                badge.style.fontWeight = '600';
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = txt;
+                textSpan.style.flex = '1';
+
+                row.appendChild(badge);
+                row.appendChild(textSpan);
+                li.appendChild(row);
             });
             
             const plans = cloned.querySelectorAll('.plans li');
             plans.forEach(li => {
                 const txt = li.textContent.replace(/\s+/g, ' ').trim();
-                li.innerHTML = `• ${txt}`;
+                li.innerHTML = '';
                 li.style.backgroundColor = 'transparent';
                 li.style.padding = '5px 0';
                 li.style.paddingLeft = '0';
                 li.style.marginLeft = '0';
                 li.style.pageBreakInside = 'avoid';
+
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.alignItems = 'center';
+                row.style.gap = '8px';
+
+                const bullet = document.createElement('span');
+                bullet.textContent = '•';
+                bullet.style.fontSize = '12px';
+                bullet.style.minWidth = '10px';
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = txt;
+                textSpan.style.flex = '1';
+
+                row.appendChild(bullet);
+                row.appendChild(textSpan);
+                li.appendChild(row);
             });
             
             // Nettoyer les info-cards
