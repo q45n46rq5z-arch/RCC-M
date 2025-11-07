@@ -318,7 +318,7 @@
             content: counter(step-counter);
             counter-increment: step-counter;
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             background: linear-gradient(135deg, var(--primary-500), var(--accent-300));
@@ -1837,6 +1837,22 @@
                 h2.style.fontWeight = 'bold';
                 h2.style.pageBreakBefore = index === 0 ? 'auto' : 'always';
                 h2.style.pageBreakAfter = 'avoid';
+            // Regrouper le contenu suivant dans un wrapper pour la page
+            let sectionWrapper = document.createElement('div');
+            sectionWrapper.style.pageBreakInside = 'avoid';
+            sectionWrapper.style.marginBottom = '8mm';
+            sectionWrapper.style.lineHeight = '1.4';
+            let node = h2.nextSibling;
+            while (node && node.tagName !== 'H2') {
+                const next = node.nextSibling;
+                sectionWrapper.appendChild(node);
+                node = next;
+            }
+            h2.parentNode.insertBefore(sectionWrapper, node);
+            const paragraphs = sectionWrapper.querySelectorAll('p, div');
+            paragraphs.forEach(p => {
+                p.style.marginBottom = '6px';
+            });
             });
             
             const h3s = cloned.querySelectorAll('h3');
