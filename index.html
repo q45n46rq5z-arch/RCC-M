@@ -29,6 +29,15 @@
                 margin: 20px 0;
             }
             .buttons { display: none !important; }
+            .official-footer {
+                page-break-before: always;
+                background: #ffffff !important;
+                border: none;
+                padding: 24px 12px;
+            }
+            .official-footer-grid {
+                gap: 18px;
+            }
         }
         * {
             margin: 0;
@@ -350,6 +359,63 @@
             color: #0f766e;
             font-weight: 700;
             font-size: 18px;
+        }
+        .official-footer {
+            margin-top: 48px;
+            padding: 32px 28px;
+            border-top: 1px solid var(--divider);
+            background: rgba(255, 255, 255, 0.78);
+            border-radius: 18px;
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+        }
+        .official-footer h2 {
+            margin-top: 0;
+            border-bottom: none;
+            padding-bottom: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .official-footer h2::before {
+            display: none;
+        }
+        .official-footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 28px;
+            margin-top: 24px;
+        }
+        .official-footer-item {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            min-height: 120px;
+        }
+        .official-footer-label {
+            font-size: 12px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .official-footer-line {
+            height: 1px;
+            background: rgba(148, 163, 184, 0.6);
+            position: relative;
+        }
+        .official-footer-line::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            right: 0;
+            width: 48px;
+            height: 6px;
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 999px;
+        }
+        .official-footer-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
         }
         .hidden {
             display: none;
@@ -965,6 +1031,32 @@
                 <h2>06 · Dossier de pièce type</h2>
                 <div class="section">
                     <div id="checklist"></div>
+                </div>
+            </div>
+
+            <div class="official-footer">
+                <h2>07 · Visa et validations</h2>
+                <div class="official-footer-grid">
+                    <div class="official-footer-item">
+                        <span class="official-footer-label">Date</span>
+                        <div class="official-footer-line"></div>
+                        <span class="official-footer-note">JJ / MM / AAAA</span>
+                    </div>
+                    <div class="official-footer-item">
+                        <span class="official-footer-label">Responsable technique</span>
+                        <div class="official-footer-line"></div>
+                        <span class="official-footer-note">Nom, signature et cachet</span>
+                    </div>
+                    <div class="official-footer-item">
+                        <span class="official-footer-label">Visa qualité</span>
+                        <div class="official-footer-line"></div>
+                        <span class="official-footer-note">Nom, signature et cachet</span>
+                    </div>
+                    <div class="official-footer-item">
+                        <span class="official-footer-label">Commentaires / Référence dossier</span>
+                        <div class="official-footer-line"></div>
+                        <span class="official-footer-note">Compléments éventuels</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1683,12 +1775,12 @@
             cleanDiv.style.position = 'absolute';
             cleanDiv.style.left = '-9999px';
             cleanDiv.style.width = '210mm';
-            cleanDiv.style.padding = '25mm 20mm';
+            cleanDiv.style.padding = '22mm 18mm';
             cleanDiv.style.backgroundColor = '#ffffff';
-            cleanDiv.style.fontFamily = 'Arial, sans-serif';
-            cleanDiv.style.fontSize = '11pt';
-            cleanDiv.style.lineHeight = '1.8';
-            cleanDiv.style.color = '#000000';
+            cleanDiv.style.fontFamily = 'Inter, Arial, sans-serif';
+            cleanDiv.style.fontSize = '10.5pt';
+            cleanDiv.style.lineHeight = '1.5';
+            cleanDiv.style.color = '#0f172a';
             
             // Cloner le contenu
             const cloned = originalContent.cloneNode(true);
@@ -1732,11 +1824,12 @@
             sections.forEach(section => {
                 section.style.borderLeft = 'none';
                 section.style.border = 'none';
-                section.style.borderTop = '1px solid #e0e0e0';
-                section.style.borderBottom = '1px solid #e0e0e0';
-                section.style.padding = '20px 0';
-                section.style.margin = '30px 0';
+                section.style.borderTop = '1px solid #d1d5db';
+                section.style.borderBottom = '1px solid #d1d5db';
+                section.style.padding = '16px 0 12px';
+                section.style.margin = '22px 0';
                 section.style.backgroundColor = 'transparent';
+                section.style.pageBreakInside = 'avoid';
             });
             
             // Nettoyer les titres (chaque h2 = nouvelle page)
@@ -1804,11 +1897,25 @@
             const checkboxes = cloned.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(cb => {
                 const label = cb.closest('label') || cb.parentElement;
-                const text = label.textContent.replace(cb.outerHTML, '').trim();
+                const text = label.textContent.replace(/\s+/g, ' ').trim();
                 const div = document.createElement('div');
-                div.style.marginBottom = '8px';
-                div.style.paddingLeft = '20px';
-                div.textContent = (cb.checked ? '☑' : '☐') + ' ' + text;
+                div.style.marginBottom = '6px';
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                div.style.gap = '10px';
+                div.style.paddingLeft = '4px';
+                div.style.pageBreakInside = 'avoid';
+
+                const symbol = document.createElement('span');
+                symbol.textContent = cb.checked ? '☑' : '☐';
+                symbol.style.fontSize = '11pt';
+                symbol.style.minWidth = '14px';
+
+                const textSpan = document.createElement('span');
+                textSpan.textContent = text;
+
+                div.appendChild(symbol);
+                div.appendChild(textSpan);
                 label.parentNode.replaceChild(div, label);
             });
             
@@ -1828,11 +1935,25 @@
                 const checked = group.find(r => r.checked);
                 if (checked) {
                     const label = checked.closest('label') || checked.parentElement;
-                    const text = label.textContent.replace(checked.outerHTML, '').trim();
+                    const text = label.textContent.replace(/\s+/g, ' ').trim();
                     const div = document.createElement('div');
-                    div.style.marginBottom = '8px';
-                    div.style.paddingLeft = '20px';
-                    div.textContent = '● ' + text;
+                    div.style.marginBottom = '6px';
+                    div.style.display = 'flex';
+                    div.style.alignItems = 'center';
+                    div.style.gap = '10px';
+                    div.style.paddingLeft = '4px';
+                    div.style.pageBreakInside = 'avoid';
+
+                    const symbol = document.createElement('span');
+                    symbol.textContent = '●';
+                    symbol.style.fontSize = '10pt';
+                    symbol.style.minWidth = '10px';
+
+                    const textSpan = document.createElement('span');
+                    textSpan.textContent = text;
+
+                    div.appendChild(symbol);
+                    div.appendChild(textSpan);
                     label.parentNode.replaceChild(div, label);
                     // Supprimer les autres radios du même groupe
                     group.forEach(r => {
@@ -1851,15 +1972,17 @@
             steps.forEach(li => {
                 li.style.borderLeft = 'none';
                 li.style.backgroundColor = 'transparent';
-                li.style.padding = '5px 0';
-                li.style.paddingLeft = '25px';
+                li.style.padding = '6px 0';
+                li.style.paddingLeft = '18px';
+                li.style.pageBreakInside = 'avoid';
             });
             
             const plans = cloned.querySelectorAll('.plans li');
             plans.forEach(li => {
                 li.style.backgroundColor = 'transparent';
-                li.style.padding = '5px 0';
-                li.style.paddingLeft = '25px';
+                li.style.padding = '6px 0';
+                li.style.paddingLeft = '18px';
+                li.style.pageBreakInside = 'avoid';
             });
             
             // Nettoyer les info-cards
@@ -1867,8 +1990,22 @@
             infoCards.forEach(card => {
                 card.style.border = 'none';
                 card.style.backgroundColor = 'transparent';
-                card.style.padding = '5px 0';
+                card.style.padding = '6px 0';
+                card.style.pageBreakInside = 'avoid';
             });
+
+            const officialFooter = cloned.querySelector('.official-footer');
+            if (officialFooter) {
+                officialFooter.style.marginTop = '28px';
+                officialFooter.style.paddingTop = '18px';
+                officialFooter.style.borderTop = '1px solid #0f172a';
+                officialFooter.style.pageBreakBefore = 'always';
+                const footerItems = officialFooter.querySelectorAll('.official-footer-item');
+                footerItems.forEach(item => {
+                    item.style.minHeight = '90px';
+                    item.style.pageBreakInside = 'avoid';
+                });
+            }
             
             cleanDiv.appendChild(cloned);
             document.body.appendChild(cleanDiv);
