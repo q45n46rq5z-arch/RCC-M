@@ -35,133 +35,236 @@
             padding: 0;
             box-sizing: border-box;
         }
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #111827;
+            --panel-bg: #f8fafc;
+            --panel-border: rgba(15, 23, 42, 0.12);
+            --primary-500: #1d4ed8;
+            --primary-600: #1e40af;
+            --accent-300: #38bdf8;
+            --text-main: #111827;
+            --text-muted: #475569;
+            --divider: rgba(148, 163, 184, 0.4);
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e8e8e8;
-            padding: 20px;
-            line-height: 1.6;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            padding: 32px;
+            line-height: 1.65;
             min-height: 100vh;
+            color: var(--text-main);
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 18px;
+            border: 1px solid var(--panel-border);
+            box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+            backdrop-filter: blur(8px);
         }
         .header {
-            background: white;
-            padding: 15px 30px;
-            border-radius: 10px 10px 0 0;
-            border-bottom: 3px solid #2c2c2c;
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.12), rgba(56, 189, 248, 0.08));
+            padding: 28px 36px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0;
+            align-items: flex-start;
+            position: relative;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 36px;
+            width: 140px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-500), var(--accent-300));
+            border-radius: 999px;
         }
         .header-left h1 {
-            color: #333;
-            font-size: 28px;
+            color: var(--text-main);
+            font-size: 30px;
             margin: 0;
+            letter-spacing: 0.02em;
+            font-weight: 700;
+        }
+        .header-left p {
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .header-badges {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(15, 23, 42, 0.08);
+            color: var(--text-muted);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+        }
+        .badge-primary {
+            background: rgba(29, 78, 216, 0.12);
+            color: var(--primary-600);
+            border-color: rgba(29, 78, 216, 0.35);
         }
         .header-right {
             text-align: right;
-            color: #666;
+            color: var(--text-muted);
             font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
         .header-right strong {
-            color: #2c2c2c;
+            color: var(--text-main);
             display: block;
-            margin-bottom: 3px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            overflow: hidden;
+            margin-bottom: 4px;
+            font-size: 13px;
+            letter-spacing: 0.1em;
         }
         .content {
-            padding: 30px;
+            padding: 40px 48px;
         }
         h2 {
-            color: #333;
-            margin: 30px 0 20px 0;
-            font-size: 22px;
+            color: var(--text-main);
+            margin: 36px 0 24px 0;
+            font-size: 24px;
             font-weight: 600;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #2c2c2c;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--divider);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary-500);
+            border-radius: 50%;
+            display: inline-block;
         }
         h3 {
-            color: #444;
-            margin: 20px 0 15px 0;
+            color: var(--text-main);
+            margin: 24px 0 16px 0;
             font-size: 18px;
             font-weight: 600;
         }
         h4 {
-            color: #555;
-            margin: 15px 0 10px 0;
+            color: var(--text-main);
+            margin: 16px 0 12px 0;
             font-size: 16px;
             font-weight: 600;
+            letter-spacing: 0.01em;
         }
         .buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin: 24px 0;
         }
         .btn {
-            padding: 18px;
-            border: 2px solid #e0e0e0;
-            background: white;
-            border-radius: 8px;
+            padding: 20px 22px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 14px;
             cursor: pointer;
-            text-align: center;
+            text-align: left;
             font-size: 15px;
             font-weight: 600;
-            transition: all 0.3s;
-            color: #333;
+            transition: all 0.35s ease;
+            color: var(--text-main);
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        .btn-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .btn-title {
+            font-size: 15px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .btn-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+        .btn::after {
+            content: '→';
+            font-size: 18px;
+            color: rgba(29, 78, 216, 0.0);
+            transition: color 0.35s ease, transform 0.35s ease;
         }
         .btn:hover {
-            border-color: #2c2c2c;
-            background: #f5f5f5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: rgba(29, 78, 216, 0.4);
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.12), rgba(56, 189, 248, 0.08));
+            transform: translateY(-3px);
+            box-shadow: 0 18px 30px rgba(15, 23, 42, 0.18);
+        }
+        .btn:hover::after {
+            color: var(--primary-500);
+            transform: translateX(4px);
         }
         .btn.selected {
-            border-color: #2c2c2c;
-            background: #2c2c2c;
-            color: white;
+            border-color: var(--primary-500);
+            background: linear-gradient(135deg, rgba(29, 78, 216, 0.25), rgba(56, 189, 248, 0.2));
+            color: var(--text-main);
+            box-shadow: 0 20px 40px rgba(29, 78, 216, 0.22);
         }
         .section {
-            background: #f8f9fa;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-            border-left: 4px solid #2c2c2c;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 28px 30px;
+            margin: 24px 0;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
         }
         .checklist-item {
             display: flex;
             align-items: center;
-            padding: 12px;
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
-            margin: 8px 0;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 12px;
+            margin: 10px 0;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.25s ease;
         }
         .checklist-item:hover {
-            border-color: #2c2c2c;
-            background: #f5f5f5;
+            border-color: rgba(29, 78, 216, 0.45);
+            background: rgba(29, 78, 216, 0.08);
         }
         .checklist-item input[type="checkbox"] {
             width: 20px;
             height: 20px;
             margin-right: 12px;
             cursor: pointer;
-            accent-color: #2c2c2c;
+            accent-color: var(--primary-500);
         }
         .checklist-item.checked {
-            background: #e8f5e9;
-            border-color: #4caf50;
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.45);
         }
         .checklist-item.checked input[type="checkbox"] {
-            accent-color: #4caf50;
+            accent-color: #22c55e;
         }
         .field {
             margin: 15px 0;
@@ -170,49 +273,56 @@
             display: block;
             font-weight: 600;
             margin-bottom: 8px;
-            color: #555;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 0.05em;
         }
         .field input, .field select, .field textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 12px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(248, 250, 252, 0.95);
         }
         .field input:focus, .field select:focus, .field textarea:focus {
             outline: none;
-            border-color: #2c2c2c;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.12);
         }
         .steps {
             list-style: none;
             margin-top: 10px;
         }
         .steps li {
-            margin: 10px 0;
-            padding: 12px 15px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            border-left: 4px solid #2c2c2c;
+            margin: 12px 0;
+            padding: 14px 18px;
+            background: rgba(29, 78, 216, 0.06);
+            border-radius: 14px;
+            border: 1px solid rgba(29, 78, 216, 0.18);
             position: relative;
-            padding-left: 40px;
+            padding-left: 48px;
+            color: var(--text-main);
         }
         .steps li:before {
             content: counter(step-counter);
             counter-increment: step-counter;
             position: absolute;
-            left: 12px;
-            background: #2c2c2c;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--primary-500), var(--accent-300));
             color: white;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 8px 16px rgba(29, 78, 216, 0.25);
         }
         .steps {
             counter-reset: step-counter;
@@ -222,19 +332,23 @@
             margin-top: 10px;
         }
         .plans li {
-            margin: 8px 0;
-            padding: 12px 15px;
-            background: #e8f5e9;
-            border-radius: 6px;
-            padding-left: 40px;
+            margin: 10px 0;
+            padding: 12px 18px;
+            background: rgba(13, 148, 136, 0.08);
+            border-radius: 12px;
+            padding-left: 46px;
             position: relative;
+            border: 1px solid rgba(13, 148, 136, 0.2);
+            color: var(--text-main);
         }
         .plans li:before {
             content: "✓";
             position: absolute;
-            left: 15px;
-            color: #4caf50;
-            font-weight: bold;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #0f766e;
+            font-weight: 700;
             font-size: 18px;
         }
         .hidden {
@@ -242,64 +356,77 @@
         }
         .action-buttons {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 32px;
+            right: 32px;
             display: flex;
-            gap: 15px;
+            gap: 16px;
             z-index: 1000;
         }
         .action-btn {
-            padding: 15px 25px;
+            padding: 16px 26px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 14px;
+            font-size: 15px;
             font-weight: 600;
+            letter-spacing: 0.02em;
             cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
+            box-shadow: 0 20px 30px rgba(15, 23, 42, 0.22);
+            transition: all 0.35s ease;
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .action-btn svg {
+            opacity: 0.85;
+            transition: transform 0.35s ease, opacity 0.35s ease;
         }
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 28px 45px rgba(15, 23, 42, 0.28);
+        }
+        .action-btn:hover svg {
+            transform: scale(1.1);
+            opacity: 1;
         }
         .btn-pdf {
-            background: #2c2c2c;
-        }
-        .btn-pdf:hover {
-            background: #3c3c3c;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
         }
         .btn-print {
-            background: #2c2c2c;
-        }
-        .btn-print:hover {
-            background: #3c3c3c;
+            background: linear-gradient(135deg, rgba(15, 118, 110, 0.9), rgba(13, 148, 136, 0.9));
         }
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin: 15px 0;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin: 20px 0;
         }
         .info-card {
-            background: white;
-            padding: 15px;
-            border-radius: 6px;
-            border: 2px solid #e0e0e0;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 18px 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .info-card label {
             display: block;
             font-size: 12px;
-            color: #666;
-            margin-bottom: 5px;
+            color: var(--text-muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             font-weight: 600;
         }
         .info-card input {
             width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 10px;
             font-size: 14px;
+            background: rgba(248, 250, 252, 0.9);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         /* Page de mot de passe */
         #password-screen {
@@ -308,7 +435,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000000;
+            background: radial-gradient(circle at top, rgba(148, 163, 184, 0.18), rgba(15, 23, 42, 0.95));
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -321,46 +448,58 @@
         }
         .password-container {
             text-align: center;
-            padding: 40px;
+            padding: 46px 54px;
+            background: rgba(15, 23, 42, 0.72);
+            border-radius: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 28px 50px rgba(15, 23, 42, 0.4);
         }
         .password-container h1 {
-            color: white;
-            font-size: 32px;
-            margin-bottom: 30px;
-            font-weight: 300;
+            color: #e2e8f0;
+            font-size: 28px;
+            margin-bottom: 28px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
         .password-input {
-            padding: 15px 20px;
+            padding: 16px 22px;
             font-size: 18px;
-            border: 2px solid #333;
-            background: #1a1a1a;
-            color: white;
-            border-radius: 8px;
-            width: 300px;
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            background: rgba(248, 250, 252, 0.95);
+            color: var(--text-main);
+            border-radius: 14px;
+            width: 320px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
         .password-input:focus {
             outline: none;
-            border-color: #666;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
         .password-btn {
             padding: 15px 40px;
-            font-size: 16px;
-            background: #2c2c2c;
+            font-size: 15px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 999px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
         .password-btn:hover {
-            background: #3c3c3c;
+            transform: translateY(-2px);
+            box-shadow: 0 20px 35px rgba(29, 78, 216, 0.35);
         }
         .password-error {
-            color: #ff4444;
-            margin-top: 15px;
-            font-size: 14px;
+            color: #f87171;
+            margin-top: 16px;
+            font-size: 13px;
+            letter-spacing: 0.04em;
             display: none;
         }
         .password-error.show {
@@ -373,27 +512,34 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000000;
+            background: radial-gradient(circle at top, rgba(37, 99, 235, 0.28), rgba(15, 23, 42, 0.94));
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 15000;
             color: white;
+            backdrop-filter: blur(6px);
         }
         #norm-selection-screen.hidden {
             display: none;
         }
         .norm-selection-container {
             text-align: center;
-            padding: 40px;
-            max-width: 800px;
+            padding: 48px;
+            max-width: 820px;
+            background: rgba(15, 23, 42, 0.75);
+            border-radius: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.28);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.45);
         }
         .norm-selection-container h1 {
-            color: white;
+            color: #e2e8f0;
             font-size: 32px;
-            margin-bottom: 40px;
-            font-weight: 300;
+            margin-bottom: 32px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
         .norm-buttons {
             display: grid;
@@ -402,63 +548,78 @@
             margin: 30px 0;
         }
         .norm-btn {
-            padding: 25px;
-            border: 2px solid #333;
-            background: #1a1a1a;
-            border-radius: 8px;
+            padding: 26px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.65);
+            border-radius: 12px;
             cursor: pointer;
             text-align: center;
             font-size: 18px;
             font-weight: 600;
             transition: all 0.3s;
-            color: white;
+            color: #e2e8f0;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.25);
+            letter-spacing: 0.05em;
         }
         .norm-btn:hover {
-            border-color: #2c2c2c;
-            background: #2c2c2c;
-            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.6);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.32), rgba(56, 189, 248, 0.28));
+            transform: translateY(-3px);
+            box-shadow: 0 24px 40px rgba(37, 99, 235, 0.35);
         }
         .version-buttons {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
             margin: 30px 0;
         }
         .version-btn {
-            padding: 20px;
-            border: 2px solid #333;
-            background: #1a1a1a;
-            border-radius: 8px;
+            padding: 18px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 12px;
             cursor: pointer;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             transition: all 0.3s;
-            color: white;
+            color: #e2e8f0;
+            letter-spacing: 0.04em;
         }
         .version-btn:hover {
-            border-color: #2c2c2c;
-            background: #2c2c2c;
+            border-color: rgba(59, 130, 246, 0.55);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(56, 189, 248, 0.25));
+            transform: translateY(-2px);
+            box-shadow: 0 20px 35px rgba(37, 99, 235, 0.25);
+        }
+        .version-btn.active {
+            border-color: rgba(37, 99, 235, 0.75);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(56, 189, 248, 0.3));
+            box-shadow: 0 24px 45px rgba(37, 99, 235, 0.32);
         }
         .back-btn {
             margin-top: 30px;
-            padding: 12px 30px;
-            background: #2c2c2c;
-            color: white;
-            border: none;
-            border-radius: 6px;
+            padding: 12px 32px;
+            background: rgba(148, 163, 184, 0.25);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            border-radius: 999px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
         }
         .back-btn:hover {
-            background: #3c3c3c;
+            background: rgba(59, 130, 246, 0.25);
+            border-color: rgba(59, 130, 246, 0.5);
         }
         .not-available-message {
             text-align: center;
             padding: 40px;
-            color: #cccccc;
+            color: #cbd5f5;
             font-size: 18px;
+            line-height: 1.7;
         }
         /* Effet d'accès refusé simple */
         #access-denied {
@@ -521,8 +682,32 @@
             margin-bottom: 30px;
         }
         .lock-icon {
-            font-size: 80px;
-            animation: lockOpen 1s ease-out;
+            width: 76px;
+            height: 76px;
+            stroke: var(--primary-500);
+            stroke-width: 1.8;
+            fill: none;
+            background: rgba(37, 99, 235, 0.14);
+            border-radius: 18px;
+            padding: 10px;
+            box-shadow: 0 18px 32px rgba(37, 99, 235, 0.28);
+            transition: opacity 0.3s ease;
+        }
+        .lock-icon path {
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .lock-closed {
+            animation: lockOpen 0.9s ease-out;
+        }
+        .lock-open {
+            display: none;
+        }
+        .lock-container.unlocked .lock-open {
+            display: inline;
+        }
+        .lock-container.unlocked .lock-closed {
+            display: none;
         }
         @keyframes lockOpen {
             0% {
@@ -534,12 +719,6 @@
             100% {
                 transform: scale(1) rotate(0deg);
             }
-        }
-        .lock-closed {
-            display: inline-block;
-        }
-        .lock-open {
-            display: none;
         }
         .lock-container.unlocked .lock-closed {
             display: none;
@@ -590,8 +769,17 @@
     <div id="access-granted">
         <div class="granted-content">
             <div class="lock-container" id="lock-container">
-                <span class="lock-icon lock-closed">🔒</span>
-                <span class="lock-icon lock-open">🔓</span>
+                <svg class="lock-icon lock-closed" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M16 22V16a8 8 0 0 1 16 0v6" />
+                    <rect x="12" y="22" width="24" height="20" rx="4" ry="4" />
+                    <circle cx="24" cy="32" r="3" />
+                </svg>
+                <svg class="lock-icon lock-open" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M30 16a8 8 0 0 0-16 0v6" />
+                    <path d="M30 16v4" />
+                    <rect x="12" y="22" width="24" height="20" rx="4" ry="4" />
+                    <circle cx="24" cy="32" r="3" />
+                </svg>
             </div>
             <div class="granted-title">Groupe ADF</div>
         </div>
@@ -602,17 +790,17 @@
         <div class="norm-selection-container">
             <h1>Sélection de la norme</h1>
             <div class="norm-buttons" id="norm-buttons">
-                <button class="norm-btn" onclick="selectNorm('RCC-CW')">RCC-CW</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-E')">RCC-E</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-M')">RCC-M</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-MR')">RCC-MR</button>
-                <button class="norm-btn" onclick="selectNorm('RCC-Mx')">RCC-Mx</button>
-                <button class="norm-btn" onclick="selectNorm('RSE-M')">RSE-M</button>
+                <button class="norm-btn" data-norm="RCC-CW">RCC-CW</button>
+                <button class="norm-btn" data-norm="RCC-E">RCC-E</button>
+                <button class="norm-btn" data-norm="RCC-M">RCC-M</button>
+                <button class="norm-btn" data-norm="RCC-MR">RCC-MR</button>
+                <button class="norm-btn" data-norm="RCC-Mx">RCC-Mx</button>
+                <button class="norm-btn" data-norm="RSE-M">RSE-M</button>
             </div>
             <div id="version-selection" class="hidden">
                 <h2 style="color: white; font-size: 24px; margin-bottom: 20px;" id="version-title"></h2>
                 <div class="version-buttons" id="version-buttons"></div>
-                <button class="back-btn" onclick="goBackToNorms()">← Retour</button>
+                <button class="back-btn" id="back-to-norms-btn">← Retour</button>
             </div>
         </div>
     </div>
@@ -620,6 +808,11 @@
         <div class="header">
             <div class="header-left">
                 <h1>Simulateur RCC-M</h1>
+                <p>Division ingénierie nucléaire · Procédés de qualification et conformité</p>
+                <div class="header-badges">
+                    <span class="badge badge-primary" id="active-version-badge">Norme active : à sélectionner</span>
+                    <span class="badge">Secteur nucléaire</span>
+                </div>
             </div>
             <div class="header-right">
                 <strong>Groupe ADF</strong>
@@ -627,27 +820,51 @@
             </div>
         </div>
         <div class="content">
-            <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Gestion et contrôle des pièces industrielles selon les normes RCC-M</p>
 
             <!-- Choix du type -->
-            <h2>1️⃣ Choix du type de produit</h2>
+            <h2>01 · Typologie du produit</h2>
             <div class="buttons">
-                <button class="btn" onclick="selectType('forged')">🔨 Pièce forgée</button>
-                <button class="btn" onclick="selectType('cast')">🏭 Pièce moulée</button>
-                <button class="btn" onclick="selectType('sheet')">📄 Tôle</button>
-                <button class="btn" onclick="selectType('tube')">🔧 Tube</button>
-                <button class="btn" onclick="selectType('other')">📦 Autre</button>
+                <button class="btn" onclick="selectType('forged', this)">
+                    <div class="btn-content">
+                        <span class="btn-title">Pièce forgée</span>
+                        <span class="btn-desc">Alliages massifs · Contrôles thermomécaniques renforcés</span>
+                    </div>
+                </button>
+                <button class="btn" onclick="selectType('cast', this)">
+                    <div class="btn-content">
+                        <span class="btn-title">Pièce moulée</span>
+                        <span class="btn-desc">Gestion des solidifications et défauts volumiques</span>
+                    </div>
+                </button>
+                <button class="btn" onclick="selectType('sheet', this)">
+                    <div class="btn-content">
+                        <span class="btn-title">Tôle</span>
+                        <span class="btn-desc">Laminage industriel · Conformité dimensionnelle étendue</span>
+                    </div>
+                </button>
+                <button class="btn" onclick="selectType('tube', this)">
+                    <div class="btn-content">
+                        <span class="btn-title">Tube</span>
+                        <span class="btn-desc">Contrôles volumiques 100% · Gestion des parois critiques</span>
+                    </div>
+                </button>
+                <button class="btn" onclick="selectType('other', this)">
+                    <div class="btn-content">
+                        <span class="btn-title">Autre</span>
+                        <span class="btn-desc">Adaptation aux équipements spéciaux et prototypages</span>
+                    </div>
+                </button>
             </div>
 
             <!-- Configuration -->
             <div id="configSection" class="hidden">
-                <h2>2️⃣ Configuration</h2>
+                <h2>02 · Configuration opérationnelle</h2>
                 <div id="configContent"></div>
             </div>
 
             <!-- Contrôles -->
             <div id="controlsSection" class="hidden">
-                <h2>3️⃣ Contrôles et critères de notation</h2>
+                <h2>03 · Contrôles et critères de notation</h2>
                 
                 <div class="section">
                     <h3>Radiographie</h3>
@@ -705,7 +922,7 @@
 
             <!-- Décision -->
             <div id="decisionSection" class="hidden">
-                <h2>4️⃣ Décision pour la pièce type</h2>
+                <h2>04 · Décision pour la pièce type</h2>
                 <div class="section">
                     <div class="checklist-item" onclick="selectRadio(this, 'acceptable')">
                         <input type="radio" name="defects" value="acceptable">
@@ -730,7 +947,7 @@
                     </div>
                 </div>
 
-                <h2>5️⃣ Examens surfaciques</h2>
+                <h2>05 · Examens surfaciques</h2>
                 <div class="section">
                     <div class="field">
                         <label>Référence à la spécification technique</label>
@@ -745,7 +962,7 @@
 
             <!-- Dossier -->
             <div id="dossierSection" class="hidden">
-                <h2>6️⃣ Dossier de pièce type</h2>
+                <h2>06 · Dossier de pièce type</h2>
                 <div class="section">
                     <div id="checklist"></div>
                 </div>
@@ -755,8 +972,8 @@
 
     <!-- Boutons d'action -->
     <div class="action-buttons no-print">
-        <button class="action-btn btn-pdf" onclick="exportPDF()">📄 Exporter PDF</button>
-        <button class="action-btn btn-print" onclick="window.print()">🖨️ Imprimer</button>
+        <button class="action-btn btn-pdf" onclick="exportPDF()">Exporter le rapport PDF</button>
+        <button class="action-btn btn-print" onclick="window.print()">Imprimer</button>
     </div>
 
     <script>
@@ -1075,18 +1292,42 @@
                 const btn = document.createElement('button');
                 btn.className = 'version-btn';
                 btn.textContent = version;
-                btn.onclick = () => selectVersion(norm, version);
+                btn.addEventListener('click', () => {
+                    versionButtons.querySelectorAll('.version-btn').forEach(v => v.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectVersion(norm, version);
+                });
                 versionButtons.appendChild(btn);
             });
             
             versionSelection.classList.remove('hidden');
         }
         
+        function bindNormButtons() {
+            const normButtons = document.querySelectorAll('#norm-buttons .norm-btn');
+            normButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const norm = btn.getAttribute('data-norm');
+                    selectNorm(norm);
+                    normButtons.forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                });
+            });
+            const backBtn = document.querySelector('#back-to-norms-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', goBackToNorms);
+            }
+        }
+
         function goBackToNorms() {
             selectedNorm = null;
             selectedVersion = null;
             sessionStorage.removeItem('selectedNorm');
             sessionStorage.removeItem('selectedVersion');
+            const badge = document.getElementById('active-version-badge');
+            if (badge) {
+                badge.textContent = 'Norme active : à sélectionner';
+            }
             
             // Restaurer l'écran de sélection de norme
             const normScreen = document.getElementById('norm-selection-screen');
@@ -1094,31 +1335,42 @@
                 <div class="norm-selection-container">
                     <h1>Sélection de la norme</h1>
                     <div class="norm-buttons" id="norm-buttons">
-                        <button class="norm-btn" onclick="selectNorm('RCC-CW')">RCC-CW</button>
-                        <button class="norm-btn" onclick="selectNorm('RCC-E')">RCC-E</button>
-                        <button class="norm-btn" onclick="selectNorm('RCC-M')">RCC-M</button>
-                        <button class="norm-btn" onclick="selectNorm('RCC-MR')">RCC-MR</button>
-                        <button class="norm-btn" onclick="selectNorm('RCC-Mx')">RCC-Mx</button>
-                        <button class="norm-btn" onclick="selectNorm('RSE-M')">RSE-M</button>
+                        <button class="norm-btn" data-norm="RCC-CW">RCC-CW</button>
+                        <button class="norm-btn" data-norm="RCC-E">RCC-E</button>
+                        <button class="norm-btn" data-norm="RCC-M">RCC-M</button>
+                        <button class="norm-btn" data-norm="RCC-MR">RCC-MR</button>
+                        <button class="norm-btn" data-norm="RCC-Mx">RCC-Mx</button>
+                        <button class="norm-btn" data-norm="RSE-M">RSE-M</button>
                     </div>
                     <div id="version-selection" class="hidden">
                         <h2 style="color: white; font-size: 24px; margin-bottom: 20px;" id="version-title"></h2>
                         <div class="version-buttons" id="version-buttons"></div>
-                        <button class="back-btn" onclick="goBackToNorms()">← Retour</button>
+                        <button class="back-btn" id="back-to-norms-btn">← Retour</button>
                     </div>
                 </div>
             `;
+            bindNormButtons();
         }
         
         function selectVersion(norm, version) {
             selectedVersion = version;
             sessionStorage.setItem('selectedNorm', norm);
             sessionStorage.setItem('selectedVersion', version);
+            const badge = document.getElementById('active-version-badge');
+            const versionButtonList = Array.from(document.querySelectorAll('.version-btn'));
+            const targetButton = versionButtonList.find(btn => btn.textContent === version);
+            versionButtonList.forEach(btn => btn.classList.remove('active'));
+            if (targetButton) {
+                targetButton.classList.add('active');
+            }
             
             // Vérifier si c'est RCC-M 2024 (seule version avec accès au simulateur)
             if (norm === 'RCC-M' && version === 'RCC-M 2024') {
                 // Masquer la sélection de norme et afficher le simulateur
                 document.getElementById('norm-selection-screen').classList.add('hidden');
+                if (badge) {
+                    badge.textContent = 'Norme active : RCC-M 2024';
+                }
                 // Le simulateur est déjà visible dans le conteneur principal
             } else {
                 // Afficher un message pour les autres versions
@@ -1130,9 +1382,16 @@
                             <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
                             <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
                         </div>
-                        <button class="back-btn" onclick="goBackToNorms()" style="margin-top: 30px;">← Retour au choix</button>
+                        <button class="back-btn" id="back-to-norms-from-message" style="margin-top: 30px;">← Retour au choix</button>
                     </div>
                 `;
+                const backBtn = document.getElementById('back-to-norms-from-message');
+                if (backBtn) {
+                    backBtn.addEventListener('click', goBackToNorms);
+                }
+                if (badge) {
+                    badge.textContent = 'Norme active : non disponible';
+                }
             }
         }
         
@@ -1166,18 +1425,24 @@
                                         <p>Le simulateur n'est actuellement disponible que pour <strong>RCC-M 2024</strong>.</p>
                                         <p style="margin-top: 20px; font-size: 14px; color: #888;">Cette version sera disponible prochainement.</p>
                                     </div>
-                                    <button class="back-btn" onclick="goBackToNorms()" style="margin-top: 30px;">← Retour au choix</button>
+                                    <button class="back-btn" id="back-to-norms-from-message" style="margin-top: 30px;">← Retour au choix</button>
                                 </div>
                             `;
+                            const backBtnMsg = document.getElementById('back-to-norms-from-message');
+                            if (backBtnMsg) {
+                                backBtnMsg.addEventListener('click', goBackToNorms);
+                            }
                         }
                     } else {
                         // Authentifié mais pas de norme/version sélectionnée, afficher la sélection
                         document.getElementById('password-screen').classList.add('hidden');
                         document.getElementById('norm-selection-screen').classList.remove('hidden');
+                        bindNormButtons();
                     }
                 } else {
                     document.getElementById('password-screen').classList.add('hidden');
                     document.getElementById('norm-selection-screen').classList.remove('hidden');
+                    bindNormButtons();
                 }
             } else {
                 // Token expiré, réinitialiser
@@ -1187,6 +1452,9 @@
                 sessionStorage.removeItem('selectedVersion');
                 sessionStorage.setItem('failedAttempts', '0');
             }
+        } else {
+            // Non authentifié : lier les boutons de norme si l'écran est visible
+            bindNormButtons();
         }
         
         // Permettre d'appuyer sur Entrée pour valider
@@ -1199,6 +1467,7 @@
                     }
                 });
             }
+            bindNormButtons();
         });
         
         function toggleCheck(element) {
@@ -1351,12 +1620,14 @@
             'Documents des pièces successives'
         ];
 
-        function selectType(type) {
+        function selectType(type, element) {
             // Mettre à jour les boutons
-            document.querySelectorAll('.btn').forEach(btn => {
+            document.querySelectorAll('.buttons .btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
-            event.target.classList.add('selected');
+            if (element) {
+                element.classList.add('selected');
+            }
 
             // Afficher la configuration
             const config = configs[type];
@@ -1620,9 +1891,9 @@
 
                 // Afficher un message de chargement
                 const btn = document.querySelector('.btn-pdf');
-                const originalText = btn ? btn.innerHTML : '📄 Exporter PDF';
+                const originalText = btn ? btn.innerHTML : 'Exporter le rapport PDF';
                 if (btn) {
-                    btn.innerHTML = '⏳ Génération...';
+                    btn.innerHTML = 'Génération en cours...';
                     btn.disabled = true;
                 }
 
@@ -1684,7 +1955,7 @@
                 // Restaurer le bouton en cas d'erreur
                 const btnRestore = document.querySelector('.btn-pdf');
                 if (btnRestore) {
-                    btnRestore.innerHTML = '📄 Exporter PDF';
+                    btnRestore.innerHTML = 'Exporter le rapport PDF';
                     btnRestore.disabled = false;
                 }
             }
