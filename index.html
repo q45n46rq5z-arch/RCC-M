@@ -1978,19 +1978,26 @@
             
             // Nettoyer les listes (étapes, plans)
             const steps = cloned.querySelectorAll('.steps li');
-            steps.forEach(li => {
+            steps.forEach((li, idx) => {
+                const txt = li.textContent.replace(/\s+/g, ' ').trim();
+                li.innerHTML = `${String(idx + 1).padStart(2, '0')} · ${txt}`;
                 li.style.borderLeft = 'none';
                 li.style.backgroundColor = 'transparent';
-                li.style.padding = '6px 0';
-                li.style.paddingLeft = '18px';
+                li.style.padding = '5px 0';
+                li.style.paddingLeft = '0';
+                li.style.marginLeft = '0';
                 li.style.pageBreakInside = 'avoid';
+                li.style.fontWeight = '500';
             });
             
             const plans = cloned.querySelectorAll('.plans li');
             plans.forEach(li => {
+                const txt = li.textContent.replace(/\s+/g, ' ').trim();
+                li.innerHTML = `• ${txt}`;
                 li.style.backgroundColor = 'transparent';
-                li.style.padding = '6px 0';
-                li.style.paddingLeft = '18px';
+                li.style.padding = '5px 0';
+                li.style.paddingLeft = '0';
+                li.style.marginLeft = '0';
                 li.style.pageBreakInside = 'avoid';
             });
             
