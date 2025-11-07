@@ -7,36 +7,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        @page {
+            size: A4 portrait;
+            margin: 20mm 18mm;
+        }
         @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; margin: 0; }
-            .container { box-shadow: none; border: none; max-width: 100%; }
-            .header { border-bottom: 2px solid #2c2c2c; margin-bottom: 30px; }
-            .action-buttons { display: none !important; }
-            .btn { display: none !important; }
-            h2 { 
-                page-break-before: always;
-                page-break-after: avoid;
-                border-bottom: 2px solid #2c2c2c;
-                padding-bottom: 10px;
-                margin-top: 0;
-            }
-            h2:first-of-type { page-break-before: auto; }
-            .section { 
-                page-break-inside: avoid;
-                border-left: none;
-                border: 1px solid #e0e0e0;
-                margin: 20px 0;
-            }
-            .buttons { display: none !important; }
-            .official-footer {
-                page-break-before: always;
+            body {
                 background: #ffffff !important;
-                border: none;
-                padding: 24px 12px;
+                padding: 0 !important;
+                margin: 0 !important;
+                color: #111827 !important;
             }
-            .official-footer-grid {
-                gap: 18px;
+            #report-content,
+            #password-screen,
+            #norm-selection-screen,
+            #access-denied,
+            #access-granted,
+            .action-buttons,
+            .no-print {
+                display: none !important;
+            }
+            .professional-document.print-mode {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                background: #ffffff !important;
             }
         }
         * {
@@ -1058,7 +1053,7 @@
     <!-- Boutons d'action -->
     <div class="action-buttons no-print">
         <button class="action-btn btn-pdf" onclick="exportPDF()">Exporter le rapport PDF</button>
-        <button class="action-btn btn-print" onclick="window.print()">Imprimer</button>
+        <button class="action-btn btn-print" onclick="printDocument()">Imprimer</button>
     </div>
 
     <script>
@@ -1759,320 +1754,562 @@
             document.getElementById('dossierSection').classList.remove('hidden');
         }
 
-        function createCleanContentForPDF() {
-            const originalContent = document.getElementById('report-content');
-            if (!originalContent) return null;
-            
-            // Créer un conteneur propre pour le PDF (format document officiel)
-            const cleanDiv = document.createElement('div');
-            cleanDiv.style.position = 'absolute';
-            cleanDiv.style.left = '-9999px';
-            cleanDiv.style.width = '210mm';
-            cleanDiv.style.padding = '22mm 18mm';
-            cleanDiv.style.backgroundColor = '#ffffff';
-            cleanDiv.style.fontFamily = 'Inter, Arial, sans-serif';
-            cleanDiv.style.fontSize = '10.5pt';
-            cleanDiv.style.lineHeight = '1.5';
-            cleanDiv.style.color = '#0f172a';
-            
-            // Cloner le contenu
-            const cloned = originalContent.cloneNode(true);
-            
-            // Supprimer tous les éléments non désirés
-            const elementsToRemove = cloned.querySelectorAll('.no-print, .action-buttons, .btn, button, .buttons');
-            elementsToRemove.forEach(el => el.remove());
-            
-            // Nettoyer le header (format document officiel)
-            const header = cloned.querySelector('.header');
-            if (header) {
-                header.style.borderBottom = '2px solid #000000';
-                header.style.padding = '20px 0';
-                header.style.marginBottom = '40px';
-                header.style.backgroundColor = 'transparent';
-                const headerLeft = header.querySelector('.header-left');
-                if (headerLeft) {
-                    const h1 = headerLeft.querySelector('h1');
-                    if (h1) {
-                        h1.style.margin = '0';
-                        h1.style.fontSize = '20pt';
-                        h1.style.color = '#000000';
-                        h1.style.fontWeight = 'bold';
-                    }
-                }
-                const headerRight = header.querySelector('.header-right');
-                if (headerRight) {
-                    headerRight.style.fontSize = '9pt';
-                    headerRight.style.color = '#000000';
-                }
-            }
-            
-            // Supprimer le texte d'introduction
-            const intro = cloned.querySelector('p');
-            if (intro && intro.textContent.includes('Gestion et contrôle')) {
-                intro.remove();
-            }
-            
-            // Nettoyer les sections (format document officiel - pas de barres latérales)
-            const sections = cloned.querySelectorAll('.section');
-            sections.forEach(section => {
-                section.style.borderLeft = 'none';
-                section.style.border = 'none';
-                section.style.borderTop = '1px solid #d1d5db';
-                section.style.borderBottom = '1px solid #d1d5db';
-                section.style.padding = '16px 0 12px';
-                section.style.margin = '22px 0';
-                section.style.backgroundColor = 'transparent';
-                section.style.pageBreakInside = 'avoid';
-            });
-            
-            // Nettoyer les titres (chaque h2 = nouvelle page)
-            const h2s = cloned.querySelectorAll('h2');
-            h2s.forEach((h2, index) => {
-                h2.style.color = '#000000';
-                h2.style.borderBottom = '2px solid #000000';
-                h2.style.paddingBottom = '10px';
-                h2.style.marginTop = index === 0 ? '0' : '0';
-                h2.style.marginBottom = '25px';
-                h2.style.fontSize = '16pt';
-                h2.style.fontWeight = 'bold';
-                h2.style.pageBreakBefore = index === 0 ? 'auto' : 'always';
-                h2.style.pageBreakAfter = 'avoid';
-            // Regrouper le contenu suivant dans un wrapper pour la page
-            let sectionWrapper = document.createElement('div');
-            sectionWrapper.style.pageBreakInside = 'avoid';
-            sectionWrapper.style.marginBottom = '8mm';
-            sectionWrapper.style.lineHeight = '1.4';
-            let node = h2.nextSibling;
-            while (node && node.tagName !== 'H2') {
-                const next = node.nextSibling;
-                sectionWrapper.appendChild(node);
-                node = next;
-            }
-            h2.parentNode.insertBefore(sectionWrapper, node);
-            const paragraphs = sectionWrapper.querySelectorAll('p, div');
-            paragraphs.forEach(p => {
-                p.style.marginBottom = '6px';
-            });
-            });
-            
-            const h3s = cloned.querySelectorAll('h3');
-            h3s.forEach(h3 => {
-                h3.style.color = '#000000';
-                h3.style.marginTop = '20px';
-                h3.style.marginBottom = '12px';
-                h3.style.fontSize = '13pt';
-                h3.style.fontWeight = 'bold';
-            });
-            
-            const h4s = cloned.querySelectorAll('h4');
-            h4s.forEach(h4 => {
-                h4.style.color = '#000000';
-                h4.style.marginTop = '15px';
-                h4.style.marginBottom = '10px';
-                h4.style.fontSize = '12pt';
-                h4.style.fontWeight = 'bold';
-            });
-            
-            // Nettoyer les champs de saisie (afficher les valeurs comme texte)
-            const inputs = cloned.querySelectorAll('input[type="text"], input[type="number"], select, textarea');
-            inputs.forEach(input => {
-                const label = input.previousElementSibling;
-                if (input.value || (input.tagName === 'SELECT' && input.selectedIndex > 0)) {
-                    const div = document.createElement('div');
-                    div.style.marginBottom = '12px';
-                    if (label && label.tagName === 'LABEL') {
-                        const labelText = document.createElement('strong');
-                        labelText.textContent = label.textContent + ' : ';
-                        labelText.style.display = 'inline';
-                        div.appendChild(labelText);
-                    }
-                    const value = document.createElement('span');
-                    value.textContent = input.value || input.options[input.selectedIndex]?.text || '';
-                    value.style.display = 'inline';
-                    div.appendChild(value);
-                    input.parentNode.replaceChild(div, input);
-                    if (label && label.tagName === 'LABEL' && label.parentNode === input.parentNode) {
-                        label.remove();
-                    }
-                } else {
-                    input.style.display = 'none';
-                    if (label && label.tagName === 'LABEL') {
-                        label.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Nettoyer les checkboxes (afficher comme liste)
-            const checkboxes = cloned.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(cb => {
-                const label = cb.closest('label') || cb.parentElement;
-                const text = label.textContent.replace(/\s+/g, ' ').trim();
-                const div = document.createElement('div');
-                div.style.marginBottom = '6px';
-                div.style.display = 'flex';
-                div.style.alignItems = 'center';
-                div.style.gap = '10px';
-                div.style.paddingLeft = '4px';
-                div.style.pageBreakInside = 'avoid';
+        function assembleProfessionalDocument(mode = 'pdf') {
+            const formatDate = (date) => date.toLocaleDateString('fr-FR');
+            const safeText = (value, fallback = '—') => {
+                if (value === null || value === undefined) return fallback;
+                const str = String(value).trim();
+                return str.length ? str : fallback;
+            };
 
-                const symbol = document.createElement('span');
-                symbol.textContent = cb.checked ? '☑' : '☐';
-                symbol.style.fontSize = '11pt';
-                symbol.style.minWidth = '14px';
+            const selectedNorm = sessionStorage.getItem('selectedNorm') || 'Non définie';
+            const selectedVersion = sessionStorage.getItem('selectedVersion') || (document.getElementById('active-version-badge')?.textContent.replace('Norme active : ', '').trim() || 'Non définie');
+            const selectedBtn = document.querySelector('.buttons .btn.selected');
+            const productTitle = selectedBtn?.querySelector('.btn-title')?.textContent.trim() || 'Non sélectionné';
+            const productDesc = selectedBtn?.querySelector('.btn-desc')?.textContent.trim() || '';
 
-                const textSpan = document.createElement('span');
-                textSpan.textContent = text;
+            const configContent = document.querySelector('#configContent');
+            const infoEntries = [];
+            const fabricationSteps = [];
+            const fabricationPlans = [];
 
-                div.appendChild(symbol);
-                div.appendChild(textSpan);
-                label.parentNode.replaceChild(div, label);
-            });
-            
-            // Nettoyer les radio buttons
-            const radios = cloned.querySelectorAll('input[type="radio"]');
-            const radioGroups = {};
-            radios.forEach(radio => {
-                const name = radio.name;
-                if (!radioGroups[name]) {
-                    radioGroups[name] = [];
-                }
-                radioGroups[name].push(radio);
-            });
-            
-            Object.keys(radioGroups).forEach(name => {
-                const group = radioGroups[name];
-                const checked = group.find(r => r.checked);
-                if (checked) {
-                    const label = checked.closest('label') || checked.parentElement;
-                    const text = label.textContent.replace(/\s+/g, ' ').trim();
-                    const div = document.createElement('div');
-                    div.style.marginBottom = '6px';
-                    div.style.display = 'flex';
-                    div.style.alignItems = 'center';
-                    div.style.gap = '10px';
-                    div.style.paddingLeft = '4px';
-                    div.style.pageBreakInside = 'avoid';
-
-                    const symbol = document.createElement('span');
-                    symbol.textContent = '●';
-                    symbol.style.fontSize = '10pt';
-                    symbol.style.minWidth = '10px';
-
-                    const textSpan = document.createElement('span');
-                    textSpan.textContent = text;
-
-                    div.appendChild(symbol);
-                    div.appendChild(textSpan);
-                    label.parentNode.replaceChild(div, label);
-                    // Supprimer les autres radios du même groupe
-                    group.forEach(r => {
-                        if (r !== checked) {
-                            const otherLabel = r.closest('label') || r.parentElement;
-                            if (otherLabel && otherLabel.parentNode) {
-                                otherLabel.remove();
-                            }
+            if (configContent) {
+                configContent.querySelectorAll('.info-card').forEach(card => {
+                    const label = card.querySelector('label')?.textContent.trim();
+                    if (!label) return;
+                    const input = card.querySelector('input, select, textarea');
+                    let value = '—';
+                    if (input) {
+                        if (input.tagName === 'SELECT') {
+                            const opt = input.options[input.selectedIndex];
+                            value = opt ? opt.textContent.trim() : '—';
+                        } else {
+                            value = (input.value || '').trim() || input.getAttribute('placeholder') || '—';
                         }
-                    });
-                }
-            });
-            
-            // Nettoyer les listes (étapes, plans)
-            const steps = cloned.querySelectorAll('.steps li');
-            steps.forEach((li, idx) => {
-                const txt = li.textContent.replace(/\s+/g, ' ').trim();
-                li.innerHTML = '';
-                li.style.borderLeft = 'none';
-                li.style.backgroundColor = 'transparent';
-                li.style.padding = '5px 0';
-                li.style.paddingLeft = '0';
-                li.style.marginLeft = '0';
-                li.style.pageBreakInside = 'avoid';
+                    }
+                    infoEntries.push({ label, value: safeText(value) });
+                });
 
-                const row = document.createElement('div');
-                row.style.display = 'flex';
-                row.style.alignItems = 'center';
-                row.style.gap = '10px';
+                configContent.querySelectorAll('.steps li').forEach(li => {
+                    const text = li.textContent.replace(/\s+/g, ' ').trim();
+                    if (text) fabricationSteps.push(text);
+                });
 
-                const badge = document.createElement('span');
-                badge.textContent = String(idx + 1).padStart(2, '0');
-                badge.style.display = 'inline-flex';
-                badge.style.alignItems = 'center';
-                badge.style.justifyContent = 'center';
-                badge.style.minWidth = '26px';
-                badge.style.height = '26px';
-                badge.style.borderRadius = '999px';
-                badge.style.backgroundColor = '#1f2937';
-                badge.style.color = '#ffffff';
-                badge.style.fontSize = '11px';
-                badge.style.fontWeight = '600';
-
-                const textSpan = document.createElement('span');
-                textSpan.textContent = txt;
-                textSpan.style.flex = '1';
-
-                row.appendChild(badge);
-                row.appendChild(textSpan);
-                li.appendChild(row);
-            });
-            
-            const plans = cloned.querySelectorAll('.plans li');
-            plans.forEach(li => {
-                const txt = li.textContent.replace(/\s+/g, ' ').trim();
-                li.innerHTML = '';
-                li.style.backgroundColor = 'transparent';
-                li.style.padding = '5px 0';
-                li.style.paddingLeft = '0';
-                li.style.marginLeft = '0';
-                li.style.pageBreakInside = 'avoid';
-
-                const row = document.createElement('div');
-                row.style.display = 'flex';
-                row.style.alignItems = 'center';
-                row.style.gap = '8px';
-
-                const bullet = document.createElement('span');
-                bullet.textContent = '•';
-                bullet.style.fontSize = '12px';
-                bullet.style.minWidth = '10px';
-
-                const textSpan = document.createElement('span');
-                textSpan.textContent = txt;
-                textSpan.style.flex = '1';
-
-                row.appendChild(bullet);
-                row.appendChild(textSpan);
-                li.appendChild(row);
-            });
-            
-            // Nettoyer les info-cards
-            const infoCards = cloned.querySelectorAll('.info-card');
-            infoCards.forEach(card => {
-                card.style.border = 'none';
-                card.style.backgroundColor = 'transparent';
-                card.style.padding = '6px 0';
-                card.style.pageBreakInside = 'avoid';
-            });
-
-            const officialFooter = cloned.querySelector('.official-footer');
-            if (officialFooter) {
-                officialFooter.style.marginTop = '28px';
-                officialFooter.style.paddingTop = '18px';
-                officialFooter.style.borderTop = '1px solid #0f172a';
-                officialFooter.style.pageBreakBefore = 'always';
-                const footerItems = officialFooter.querySelectorAll('.official-footer-item');
-                footerItems.forEach(item => {
-                    item.style.minHeight = '90px';
-                    item.style.pageBreakInside = 'avoid';
+                configContent.querySelectorAll('.plans li').forEach(li => {
+                    const text = li.textContent.replace(/\s+/g, ' ').trim();
+                    if (text) fabricationPlans.push(text);
                 });
             }
-            
-            cleanDiv.appendChild(cloned);
-            document.body.appendChild(cleanDiv);
-            
-            return cleanDiv;
+
+            const controlsData = [];
+            document.querySelectorAll('#controlsSection .section').forEach(section => {
+                const title = section.querySelector('h3')?.textContent.trim();
+                const checklistItems = [];
+                section.querySelectorAll('.checklist-item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const span = item.querySelector('span');
+                    const text = (span ? span.textContent : item.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (text) {
+                        checklistItems.push({ text, checked: checkbox ? checkbox.checked : false });
+                    }
+                });
+                const fieldItems = [];
+                section.querySelectorAll('.field').forEach(field => {
+                    const label = field.querySelector('label')?.textContent.trim();
+                    if (!label) return;
+                    const input = field.querySelector('input, select, textarea');
+                    let value = '—';
+                    if (input) {
+                        if (input.tagName === 'SELECT') {
+                            const opt = input.options[input.selectedIndex];
+                            value = opt ? opt.textContent.trim() : '—';
+                        } else {
+                            value = (input.value || '').trim() || input.getAttribute('placeholder') || '—';
+                        }
+                    }
+                    fieldItems.push({ label, value: safeText(value) });
+                });
+                if (title || checklistItems.length || fieldItems.length) {
+                    controlsData.push({ title, checklistItems, fieldItems });
+                }
+            });
+
+            const decisionSection = document.querySelector('#decisionSection');
+            let decisionData = null;
+            if (decisionSection) {
+                const checkedRadio = decisionSection.querySelector('input[type="radio"]:checked');
+                if (checkedRadio) {
+                    const container = checkedRadio.closest('.checklist-item');
+                    if (container) {
+                        const label = container.querySelector('strong')?.textContent.trim() || container.textContent.replace(/\s+/g, ' ').trim();
+                        const note = container.querySelector('small')?.textContent.trim() || '';
+                        decisionData = { label: safeText(label), note: safeText(note, '') };
+                    }
+                }
+            }
+
+            const examSection = decisionSection ? decisionSection.querySelectorAll('.section')[1] : null;
+            const examFields = [];
+            const examChecklist = [];
+            if (examSection) {
+                examSection.querySelectorAll('.field').forEach(field => {
+                    const label = field.querySelector('label')?.textContent.trim();
+                    if (!label) return;
+                    const input = field.querySelector('input, select, textarea');
+                    let value = '—';
+                    if (input) {
+                        if (input.tagName === 'SELECT') {
+                            const opt = input.options[input.selectedIndex];
+                            value = opt ? opt.textContent.trim() : '—';
+                        } else {
+                            value = (input.value || '').trim() || input.getAttribute('placeholder') || '—';
+                        }
+                    }
+                    examFields.push({ label, value: safeText(value) });
+                });
+                examSection.querySelectorAll('.checklist-item').forEach(item => {
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const span = item.querySelector('span');
+                    const text = (span ? span.textContent : item.textContent || '').replace(/\s+/g, ' ').trim();
+                    if (text) {
+                        examChecklist.push({ text, checked: checkbox ? checkbox.checked : false });
+                    }
+                });
+            }
+
+            const dossierItems = [];
+            document.querySelectorAll('#checklist .checklist-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const span = item.querySelector('span');
+                const text = (span ? span.textContent : item.textContent || '').replace(/\s+/g, ' ').trim();
+                if (text) {
+                    dossierItems.push({ text, checked: checkbox ? checkbox.checked : false });
+                }
+            });
+
+            const root = document.createElement('div');
+            root.className = 'professional-document';
+            if (mode === 'pdf') {
+                root.style.position = 'absolute';
+                root.style.left = '-9999px';
+                root.style.top = '0';
+                root.style.zIndex = '99999';
+            } else if (mode === 'print') {
+                root.classList.add('print-mode');
+            }
+
+            const style = document.createElement('style');
+            style.textContent = `
+                .professional-document {
+                    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+                    color: #111827;
+                    background: #ffffff;
+                    width: 210mm;
+                }
+                .professional-document * {
+                    box-sizing: border-box;
+                }
+                .pdf-document {
+                    width: 100%;
+                    background: #ffffff;
+                }
+                .pdf-page {
+                    width: 210mm;
+                    min-height: 297mm;
+                    padding: 25mm 22mm;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    background: #ffffff;
+                    page-break-after: always;
+                }
+                .pdf-page:last-child {
+                    page-break-after: auto;
+                }
+                .pdf-title {
+                    font-size: 22pt;
+                    font-weight: 700;
+                    text-align: center;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    margin-bottom: 8mm;
+                }
+                .pdf-subtitle {
+                    text-align: center;
+                    font-size: 12pt;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    margin-bottom: 6mm;
+                    color: #374151;
+                }
+                .pdf-cover-line {
+                    width: 100%;
+                    height: 1px;
+                    background: #111827;
+                    margin: 10mm 0;
+                }
+                .pdf-paragraph {
+                    font-size: 12pt;
+                    line-height: 1.5;
+                    text-align: justify;
+                    margin-bottom: 5mm;
+                }
+                .pdf-section-title {
+                    font-size: 18pt;
+                    font-weight: 700;
+                    text-align: center;
+                    margin-bottom: 8mm;
+                    letter-spacing: 0.05em;
+                    text-transform: uppercase;
+                }
+                .pdf-subsection-title {
+                    font-size: 13pt;
+                    font-weight: 700;
+                    margin-top: 6mm;
+                    margin-bottom: 3mm;
+                }
+                .pdf-field {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 12mm;
+                    border-bottom: 1px solid #e5e7eb;
+                    padding-bottom: 3mm;
+                    margin-bottom: 4mm;
+                    font-size: 12pt;
+                }
+                .pdf-field-label {
+                    font-weight: 600;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    flex: 0 0 40%;
+                }
+                .pdf-field-value {
+                    flex: 1;
+                    text-align: justify;
+                }
+                .pdf-list {
+                    list-style: none;
+                    padding-left: 0;
+                    margin: 0 0 5mm 0;
+                }
+                .pdf-list li {
+                    margin-bottom: 3mm;
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 6mm;
+                    font-size: 12pt;
+                    line-height: 1.5;
+                }
+                .pdf-list li .marker {
+                    flex: 0 0 8mm;
+                    font-weight: 600;
+                }
+                .pdf-meta-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 6mm 12mm;
+                    font-size: 12pt;
+                }
+                .pdf-meta-box {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2mm;
+                }
+                .pdf-meta-label {
+                    font-size: 11pt;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #374151;
+                }
+                .pdf-meta-value {
+                    font-size: 12pt;
+                }
+                .pdf-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-bottom: 6mm;
+                }
+                .pdf-table tr {
+                    border-bottom: 1px solid #e5e7eb;
+                }
+                .pdf-table td {
+                    padding: 3mm 2mm;
+                    font-size: 12pt;
+                }
+                .pdf-table td:first-child {
+                    width: 40%;
+                    font-weight: 600;
+                    letter-spacing: 0.05em;
+                    text-transform: uppercase;
+                }
+                .pdf-signature-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                    gap: 10mm 12mm;
+                    margin-top: auto;
+                }
+                .pdf-signature-box {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6mm;
+                }
+                .pdf-signature-label {
+                    font-size: 11pt;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                }
+                .pdf-signature-line {
+                    height: 1px;
+                    background: #1f2937;
+                }
+                .professional-document.print-mode {
+                    display: none;
+                }
+                @media print {
+                    .professional-document.print-mode {
+                        display: block !important;
+                        width: 100% !important;
+                    }
+                }
+            `;
+            root.appendChild(style);
+
+            const documentContainer = document.createElement('div');
+            documentContainer.className = 'pdf-document';
+            root.appendChild(documentContainer);
+
+            const createPage = (title) => {
+                const page = document.createElement('section');
+                page.className = 'pdf-page';
+                if (title) {
+                    const heading = document.createElement('h2');
+                    heading.className = 'pdf-section-title';
+                    heading.textContent = title;
+                    page.appendChild(heading);
+                }
+                return page;
+            };
+
+            const appendField = (parent, label, value) => {
+                const row = document.createElement('div');
+                row.className = 'pdf-field';
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'pdf-field-label';
+                labelSpan.textContent = safeText(label);
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'pdf-field-value';
+                valueSpan.textContent = safeText(value);
+                row.appendChild(labelSpan);
+                row.appendChild(valueSpan);
+                parent.appendChild(row);
+            };
+
+            const appendParagraph = (parent, text) => {
+                if (!text) return;
+                const paragraph = document.createElement('p');
+                paragraph.className = 'pdf-paragraph';
+                paragraph.textContent = text;
+                parent.appendChild(paragraph);
+            };
+
+            const appendList = (parent, items, options = {}) => {
+                if (!items || !items.length) return;
+                const list = document.createElement('ul');
+                list.className = 'pdf-list';
+                items.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    const marker = document.createElement('span');
+                    marker.className = 'marker';
+                    let textValue;
+                    if (options.type === 'numbered') {
+                        marker.textContent = String(index + 1).padStart(2, '0');
+                        textValue = item;
+                    } else if (options.type === 'check') {
+                        marker.textContent = item.checked ? '✔' : '□';
+                        textValue = item.text;
+                    } else {
+                        marker.textContent = '•';
+                        textValue = item;
+                    }
+                    const content = document.createElement('span');
+                    content.textContent = safeText(textValue);
+                    content.style.flex = '1';
+                    li.appendChild(marker);
+                    li.appendChild(content);
+                    list.appendChild(li);
+                });
+                parent.appendChild(list);
+            };
+
+            const appendTable = (parent, rows) => {
+                if (!rows || !rows.length) return;
+                const table = document.createElement('table');
+                table.className = 'pdf-table';
+                const tbody = document.createElement('tbody');
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+                    const tdLabel = document.createElement('td');
+                    tdLabel.textContent = safeText(row.label);
+                    const tdValue = document.createElement('td');
+                    tdValue.textContent = safeText(row.value);
+                    tr.appendChild(tdLabel);
+                    tr.appendChild(tdValue);
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                parent.appendChild(table);
+            };
+
+            const appendSubsection = (parent, title) => {
+                if (!title) return;
+                const heading = document.createElement('h3');
+                heading.className = 'pdf-subsection-title';
+                heading.textContent = title;
+                parent.appendChild(heading);
+            };
+
+            const cover = createPage();
+            cover.classList.add('pdf-cover');
+            const coverTitle = document.createElement('h1');
+            coverTitle.className = 'pdf-title';
+            coverTitle.textContent = 'Dossier RCC-M';
+            cover.appendChild(coverTitle);
+
+            const coverSubtitle = document.createElement('p');
+            coverSubtitle.className = 'pdf-subtitle';
+            coverSubtitle.textContent = `${safeText(selectedNorm)} · ${safeText(selectedVersion)}`;
+            cover.appendChild(coverSubtitle);
+
+            const coverLine = document.createElement('div');
+            coverLine.className = 'pdf-cover-line';
+            cover.appendChild(coverLine);
+
+            const metaGrid = document.createElement('div');
+            metaGrid.className = 'pdf-meta-grid';
+            const metaEntries = [
+                { label: "Date d'édition", value: formatDate(new Date()) },
+                { label: 'Responsable', value: 'Groupe ADF – Michoux Baptiste' },
+                { label: 'Type de produit', value: productTitle },
+                { label: 'Description', value: productDesc || '—' }
+            ];
+
+            metaEntries.forEach(entry => {
+                const box = document.createElement('div');
+                box.className = 'pdf-meta-box';
+                const label = document.createElement('span');
+                label.className = 'pdf-meta-label';
+                label.textContent = entry.label;
+                const value = document.createElement('span');
+                value.className = 'pdf-meta-value';
+                value.textContent = safeText(entry.value);
+                box.appendChild(label);
+                box.appendChild(value);
+                metaGrid.appendChild(box);
+            });
+
+            cover.appendChild(metaGrid);
+            appendParagraph(cover, 'Ce dossier regroupe l\'ensemble des informations de configuration, de contrôle et de validation associées à la pièce type conformément au référentiel RCC-M.');
+            documentContainer.appendChild(cover);
+
+            const section1 = createPage('01. Typologie du produit');
+            appendField(section1, 'Type sélectionné', productTitle);
+            if (productDesc) {
+                appendParagraph(section1, productDesc);
+            }
+            documentContainer.appendChild(section1);
+
+            const section2 = createPage('02. Configuration opérationnelle');
+            appendTable(section2, infoEntries);
+            appendSubsection(section2, 'Étapes de fabrication');
+            appendList(section2, fabricationSteps, { type: 'numbered' });
+            appendSubsection(section2, 'Croquis et plans');
+            appendList(section2, fabricationPlans, { type: 'bullet' });
+            documentContainer.appendChild(section2);
+
+            const section3 = createPage('03. Contrôles et critères de notation');
+            controlsData.forEach(block => {
+                appendSubsection(section3, block.title);
+                appendTable(section3, block.fieldItems);
+                appendList(section3, block.checklistItems, { type: 'check' });
+            });
+            documentContainer.appendChild(section3);
+
+            const section4 = createPage('04. Décision pour la pièce type');
+            if (decisionData) {
+                appendField(section4, 'Décision retenue', decisionData.label);
+                if (decisionData.note) {
+                    appendParagraph(section4, decisionData.note);
+                }
+            } else {
+                appendField(section4, 'Décision retenue', 'Non renseignée');
+            }
+            documentContainer.appendChild(section4);
+
+            const section5 = createPage('05. Examens surfaciques');
+            appendTable(section5, examFields);
+            appendList(section5, examChecklist, { type: 'check' });
+            documentContainer.appendChild(section5);
+
+            const section6 = createPage('06. Dossier de pièce type');
+            appendList(section6, dossierItems, { type: 'check' });
+            documentContainer.appendChild(section6);
+
+            const section7 = createPage('07. Visa et validations');
+            const signatureGrid = document.createElement('div');
+            signatureGrid.className = 'pdf-signature-grid';
+            const signatureEntries = [
+                { label: 'Date', value: '' },
+                { label: 'Responsable technique', value: '' },
+                { label: 'Visa qualité', value: '' },
+                { label: 'Commentaires / Référence dossier', value: '' }
+            ];
+
+            signatureEntries.forEach(entry => {
+                const box = document.createElement('div');
+                box.className = 'pdf-signature-box';
+                const label = document.createElement('span');
+                label.className = 'pdf-signature-label';
+                label.textContent = entry.label;
+                const line = document.createElement('div');
+                line.className = 'pdf-signature-line';
+                box.appendChild(label);
+                box.appendChild(line);
+                signatureGrid.appendChild(box);
+            });
+
+            section7.appendChild(signatureGrid);
+            documentContainer.appendChild(section7);
+
+            document.body.appendChild(root);
+            return root;
+        }
+
+        function createCleanContentForPDF() {
+            return assembleProfessionalDocument('pdf');
+        }
+
+        function printDocument() {
+            const docRoot = assembleProfessionalDocument('print');
+            if (!docRoot) {
+                window.print();
+                return;
+            }
+            const previousAfterPrint = window.onafterprint;
+            window.onafterprint = function() {
+                if (docRoot && docRoot.parentNode) {
+                    docRoot.parentNode.removeChild(docRoot);
+                }
+                if (typeof previousAfterPrint === 'function') {
+                    previousAfterPrint();
+                }
+                window.onafterprint = previousAfterPrint;
+            };
+            setTimeout(() => window.print(), 50);
         }
         
         async function exportPDF() {
+            let cleanElement = null;
+            let originalText = 'Exporter le rapport PDF';
             try {
                 // Vérifier que les bibliothèques sont chargées
                 if (typeof html2canvas === 'undefined') {
@@ -2087,14 +2324,14 @@
 
                 // Afficher un message de chargement
                 const btn = document.querySelector('.btn-pdf');
-                const originalText = btn ? btn.innerHTML : 'Exporter le rapport PDF';
+                originalText = btn ? btn.innerHTML : 'Exporter le rapport PDF';
                 if (btn) {
                     btn.innerHTML = 'Génération en cours...';
                     btn.disabled = true;
                 }
 
                 // Créer le contenu propre pour le PDF
-                const cleanElement = createCleanContentForPDF();
+                cleanElement = createCleanContentForPDF();
                 if (!cleanElement) {
                     throw new Error('Impossible de créer le contenu pour le PDF');
                 }
@@ -2108,9 +2345,6 @@
                     width: cleanElement.scrollWidth,
                     height: cleanElement.scrollHeight
                 });
-
-                // Supprimer l'élément temporaire
-                document.body.removeChild(cleanElement);
 
                 const imgData = canvas.toDataURL('image/png', 1.0);
                 
@@ -2153,6 +2387,10 @@
                 if (btnRestore) {
                     btnRestore.innerHTML = 'Exporter le rapport PDF';
                     btnRestore.disabled = false;
+                }
+            } finally {
+                if (cleanElement && cleanElement.parentNode) {
+                    cleanElement.parentNode.removeChild(cleanElement);
                 }
             }
         }
